@@ -1,0 +1,53 @@
+<div class="row">
+	<div class="col-lg-5 d-none d-lg-block bg-register-image"></div>
+	<div class="col-lg-7">
+		<div class="p-5">
+			<div class="mb-4 text-center">
+				<img style="width: 100%; max-width: 250px;" alt="Logo ESPM" src="<%- staticRoot %>/img/logo.png" />
+			</div>
+			<form method="POST">
+				<div class="form-group row">
+					<div class="col-sm-6 mb-3 mb-sm-0">
+						<input type="text" class="form-control" id="exampleFirstName"
+							placeholder="Nome">
+					</div>
+					<div class="col-sm-6">
+						<input type="text" class="form-control" id="exampleLastName"
+							placeholder="Sobrenome">
+					</div>
+				</div>
+				<div class="form-group">
+					<input type="email" class="form-control" id="exampleInputEmail"
+						placeholder="Endereço de Email">
+				</div>
+				<div class="form-group row">
+					<div class="col-sm-6 mb-3 mb-sm-0">
+						<input type="password" class="form-control"
+							id="exampleInputPassword" placeholder="Senha">
+					</div>
+					<div class="col-sm-6">
+						<input type="password" class="form-control"
+							id="exampleRepeatPassword" placeholder="Repetir Senha">
+					</div>
+				</div>
+				<button type="submit" class="btn btn-primary btn-user btn-block">
+					Registrar Conta
+				</button>
+				<hr />
+				<a href="#" class="btn btn-google btn-user btn-block">
+					<i class="fab fa-google fa-fw"></i> Registrar com o Google
+				</a>
+				<a href="#" class="btn btn-facebook btn-user btn-block">
+					<i class="fab fa-facebook-f fa-fw"></i> Registrar com o Facebook
+				</a>
+			</form>
+			<hr />
+			<div class="text-center">
+				<a class="small" href="<%- root %>/exemplo/esqueci">Esqueceu a Senha?</a>
+			</div>
+			<div class="text-center">
+				<a class="small" href="<%- root %>/login">Já possui uma Conta? Faça o Login!</a>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,21 @@
+// Customizações extras :)
+
+.quebra-linha-com-quebra-espaco {
+	white-space: pre-wrap !important;
+}
+
+.quebra-linha-sem-quebra-espaco {
+	white-space: pre !important;
+}
+
+.quebra-linha {
+	white-space: pre-line !important;
+}
+
+.altura-linha-15 {
+	line-height: 1.5rem;
+}
+
+.obs-col {
+	min-width: 25rem;
+}

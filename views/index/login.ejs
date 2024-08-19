@@ -1,0 +1,26 @@
+﻿<div class="row">
+	<div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+	<div class="col-lg-6">
+		<div class="p-5">
+			<div class="mb-4 text-center">
+				<img style="width: 100%; max-width: 250px;" alt="Logo ESPM" src="<%- staticRoot %>/img/logo.png" />
+			</div>
+			<h1 class="h3 mb-4 text-center">Gerenciador de Visitas a Ambientes Virtuais</h1>
+			<div class="user">
+				<% if (mensagem) { %>
+				<div class="alert alert-danger"><%= mensagem %></div>
+				<% } %>
+				<a href="<%- ssoRedir %>" class="btn btn-primary btn-user btn-block">
+					Login
+				</a>
+			<hr/>
+			<div class="text-center">
+				<a href="https://sistemasdeinformacao.espm.edu.br" target="_blank">
+					<small>Desenvolvido em 2024 pelo curso de Sistemas de Informação da ESPM</small>
+					<br/>
+					<img src="<%- staticRoot %>/img/logo-si-512.png" style="width: 100%; max-width: 150px;" />
+				</a>
+			</div>
+		</div>
+	</div>
+</div>
