@@ -1,0 +1,62 @@
+<form id="criarVisita" method="POST" enctype="multipart/form-data">
+    <div class="form-group mb-3">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Nome do Local"
+        name="nome"
+        id="nome"
+      />
+    </div>
+    <div class="form-group mb-3">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="URL"
+        name="url"
+        id="url"
+      />
+    </div>
+    <div class="d-grid mt-4">
+      <button type="submit" class="btn btn-primary" onclick="cadastrar()">
+        Criar Visita
+      </button>
+    </div>
+  </form>
+  
+  <script>
+    async function cadastrar(form) {
+      const response = await fetch("/api/predio/criarLocal", {
+        method: "post",
+        body: new FormData(form),
+      });
+    }
+  
+    $(function () {
+      const criarVisita = $("#criarVisita");
+  
+      criarVisita.validate({
+        rules: {
+          nome: {
+            required: true,
+          },
+            url: {
+                required: true,
+            },
+        },
+        submitHandler: function (form) {
+          event.preventDefault();
+  
+          cadastrar(form);
+  
+          Swal.fire({
+            icon: "success",
+            title: `Predio adicionado com sucesso`,
+            confirmButtonColor: "#007bff",
+            timer: 3000,
+          });
+        },
+      });
+    });
+  </script>
+  

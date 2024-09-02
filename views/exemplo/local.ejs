@@ -1,0 +1,129 @@
+    <form id="criarVisita" method="POST" enctype="multipart/form-data">
+    <div class="form-group mb-3">
+        <input
+        type="text"
+        class="form-control"
+        placeholder="Nome do Local"
+        name="nome"
+        id="nome"
+        />
+    </div>
+    <div class="form-group mb-3">
+        <input
+        type="text"
+        class="form-control"
+        placeholder="Nome Curto"
+        name="nomeCurto"
+        id="nomeCurto"
+        />
+    </div>
+    <div class="form-group mb-3">
+        <input
+        type="text"
+        class="form-control"
+        placeholder="Versão"
+        name="versao"
+        id="versao"
+        />
+    </div>
+    <div class="form-group mb-3">
+        <input type="color" class="form-control" name="rgb" id="rgb" />
+    </div>
+    <div class="form-group mb-3">
+        <label for="predio">Prédio</label>
+        <select class="form-control" name="predio" id="predio">
+            <option value="" disabled selected>Selecione um prédio</option>
+            <% for (let i = 0; i < predio.length; i++) { %>
+                <option value="<%= predio[i].id %>"><%= predio[i].nome %></option>
+            <% } %>
+        </select>        
+    </div>
+    <div class="form-group col-md-6">
+        <label for="imagem">Imagem</label>
+        <div class="custom-file">
+        <input
+            class="form-control-file"
+            type="file"
+            id="imagem"
+            name="imagem"
+            accept="image/*"
+        />
+        <label class="custom-file-label" for="imagem"
+            >Adicionar imagem 16x9</label
+        >
+        </div>
+    </div>
+    <div class="d-grid mt-4">
+        <button type="submit" class="btn btn-primary" onclick="cadastrar()">
+        Criar Visita
+        </button>
+    </div>
+    </form>
+
+    <script>
+    const fileInput = document.getElementById("imagem");
+
+    fileInput.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+        const imageDataURL = event.target.result;
+
+        Swal.fire({
+            position: "top-end",
+            title: "Imagem selecionada",
+            imageUrl: imageDataURL,
+            imageAlt: "Selected Image",
+            showConfirmButton: false,
+            imageWidth: 200,
+            imageHeight: 200,
+            timer: 2000,
+        });
+        };
+        reader.readAsDataURL(file);
+    });
+
+    async function cadastrar(form) {
+        const response = await fetch("/api/local/criarLocal", {
+        method: "post",
+        body: new FormData(form),
+        });
+    }
+
+    $(function () {
+        const criarVisita = $("#criarVisita");
+
+        criarVisita.validate({
+        rules: {
+            nome: {
+            required: true,
+            },
+            nomeCurto: {
+            required: true,
+            },
+            rgb: {
+            required: true,
+            },
+            versao: {
+            required: true,
+            },
+            imagem: {
+            required: true,
+            },
+        },
+        submitHandler: function (form) {
+            event.preventDefault();
+
+            cadastrar(form);
+
+            Swal.fire({
+            icon: "success",
+            title: `Local adicionado com sucesso`,
+            confirmButtonColor: "#007bff",
+            timer: 3000,
+            });
+        },
+        });
+    });
+    </script>

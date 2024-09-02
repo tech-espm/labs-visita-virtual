@@ -97,6 +97,42 @@ class ExemploRoute {
 		else
 			res.render("exemplo/vazia", { layout: "layout-sem-form", titulo: "Vazia (Sem Form)", usuario: u });
 	}
+
+
+	public static async local(req: app.Request, res: app.Response) {
+		let u = await Usuario.cookie(req);
+		if (!u)
+			res.redirect(app.root + "/login");
+		else {
+			let predio: any[];
+	
+			await app.sql.connect(async (sql: app.Sql) => {
+				predio = await sql.query("SELECT id, nome FROM predio;");
+			});
+	
+			res.render("exemplo/local", { 
+				layout: "layout-sem-form", 
+				titulo: "Criar Local", 
+				usuario: u,
+				predio: predio // Adicione a variável predio aqui
+			});
+		}
+	}	
+
+	public static async predio(req: app.Request, res: app.Response) {
+
+		let u = await Usuario.cookie(req);
+
+		if (!u)
+			res.redirect(app.root + "/login");
+		else
+			res.render("exemplo/predio", { layout: "layout-sem-form", titulo: "Criar Predio", usuario: u });
+	}
+
+
+
+
+
 }
 
 export = ExemploRoute;
