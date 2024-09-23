@@ -64,6 +64,13 @@ class IndexRoute {
 			await Usuario.efetuarLogout(u, res);
 		res.redirect(app.root + "/");
 	}
+
+	public static async visita(req: app.Request, res: app.Response) {
+		res.render("index/visita", {
+			layout: "layout-vazio",
+			titulo: "Visita"
+		});
+	}
 }
 
 export = IndexRoute;

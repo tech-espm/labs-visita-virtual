@@ -19,8 +19,8 @@ CREATE TABLE usuario (
   nome varchar(100) NOT NULL,
   idperfil int NOT NULL,
   token char(32) DEFAULT NULL,
-  exclusao datetime NULL,
   criacao datetime NOT NULL,
+  exclusao datetime NULL,
   PRIMARY KEY (id),
   UNIQUE KEY usuario_email_UN (email),
   KEY usuario_exclusao_IX (exclusao),
@@ -29,3 +29,35 @@ CREATE TABLE usuario (
 );
 
 INSERT INTO usuario (email, nome, idperfil, token, criacao) VALUES ('admin@espm.br', 'Administrador', 1, NULL, NOW());
+
+CREATE TABLE predio (
+  id int NOT NULL AUTO_INCREMENT,
+  idusuario int NOT NULL,
+  nome VARCHAR(50) NOT NULL,
+  url VARCHAR(75) NOT NULL,
+  criacao datetime NOT NULL,
+  exclusao datetime NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY predio_url_UN (url),
+  KEY predio_exclusao_IX (exclusao),
+  KEY predio_idusuario_exclusao_FK_IX (idusuario, exclusao),
+  CONSTRAINT predio_idusuario_FK FOREIGN KEY (idusuario) REFERENCES usuario (id) ON DELETE RESTRICT ON UPDATE RESTRICT
+);
+
+CREATE TABLE local (
+  id int NOT NULL AUTO_INCREMENT,
+  idpredio int NOT NULL,
+  idusuario int NOT NULL,
+  nome VARCHAR(50) NOT NULL,
+  rgb VARCHAR(10) NOT NULL,
+  nome_curto VARCHAR(50) NOT NULL,
+  versao INT NOT NULL,
+  criacao datetime NOT NULL,
+  exclusao datetime NULL,
+  PRIMARY KEY (id),
+  KEY local_exclusao_IX (exclusao),
+  KEY local_idpredio_exclusao_FK_IX (idpredio, exclusao),
+  KEY local_idusuario_exclusao_FK_IX (idusuario, exclusao),
+  CONSTRAINT local_idpredio_FK FOREIGN KEY (idpredio) REFERENCES predio (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT local_idusuario_FK FOREIGN KEY (idusuario) REFERENCES usuario (id) ON DELETE RESTRICT ON UPDATE RESTRICT
+);
