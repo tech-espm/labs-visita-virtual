@@ -19,33 +19,6 @@ class UsuarioApiRoute {
 		res.sendStatus(204);
 	}
 
-	public static async listar(req: app.Request, res: app.Response) {
-		const u = await Usuario.cookie(req, res, true);
-		if (!u)
-			return;
-
-		res.json(await Usuario.listar());
-	}
-
-	@app.http.post()
-	public static async criarExterno(req: app.Request, res: app.Response) {
-		const usuario: Usuario = req.body;
-
-		if (usuario) {
-			// Usuários criados externamente só podem ser usuários comuns
-			usuario.idperfil = Perfil.Comum;
-		}
-
-		const erro = await Usuario.criar(usuario);
-
-		if (erro) {
-			res.status(400).json(erro);
-			return;
-		}
-
-		res.sendStatus(204);
-	}
-
 	@app.http.post()
 	public static async criar(req: app.Request, res: app.Response) {
 		const u = await Usuario.cookie(req, res, true);

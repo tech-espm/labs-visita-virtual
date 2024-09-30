@@ -36,8 +36,49 @@
       </div>
     </div>
   </li>
+
+  <li class="nav-item">
+      <a
+          class="nav-link collapsed"
+          href="#"
+          data-toggle="collapse"
+          data-target="#collapsePredio"
+          aria-expanded="true"
+          aria-controls="collapsePredio"
+      >
+          <i class="fas fa-fw fa-building"></i>
+          <span>Prédios</span>
+      </a>
+      <div id="collapsePredio" class="collapse" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" href="<%- root %>/predio/criar">Criar</a>
+              <a class="collapse-item" href="<%- root %>/predio/listar">Gerenciar</a>
+          </div>
+      </div>
+  </li>
+
+  <li class="nav-item">
+      <a
+          class="nav-link collapsed"
+          href="#"
+          data-toggle="collapse"
+          data-target="#collapseLocal"
+          aria-expanded="true"
+          aria-controls="collapseLocal"
+      >
+          <i class="fas fa-fw fa-map-marker-alt"></i>
+          <span>Locais</span>
+      </a>
+      <div id="collapseLocal" class="collapse" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" href="<%- root %>/local/criar">Criar</a>
+              <a class="collapse-item" href="<%- root %>/local/listar">Gerenciar</a>
+          </div>
+      </div>
+  </li>
   <% } %>
 
+<!--
   <hr class="sidebar-divider" />
 
   <div class="sidebar-heading">Interface</div>
@@ -145,33 +186,6 @@
     </a>
   </li>
 
-
-  <hr class="sidebar-divider" />
-
-
-  <% if (usuario && usuario.admin) { %>
-    <li class="nav-item">
-        <a
-            class="nav-link collapsed"
-            href="#"
-            data-toggle="collapse"
-            data-target="#collapsePredio"
-            aria-expanded="true"
-            aria-controls="collapsePredio"
-        >
-            <i class="fas fa-fw fa-users"></i>
-            <span>Prédios</span>
-        </a>
-        <div id="collapsePredio" class="collapse" data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" href="<%- root %>/predio/editar">Criar</a>
-                <a class="collapse-item" href="<%- root %>/predio/listar">Gerenciar</a>
-            </div>
-        </div>
-    </li>
-<% } %>
-
-
   <hr class="sidebar-divider" />
 
   <div class="sidebar-heading">Local</div>
@@ -190,6 +204,7 @@
 
 
 
+-->
 
   <hr class="sidebar-divider d-none d-md-block" />
 

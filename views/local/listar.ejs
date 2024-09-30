@@ -1,0 +1,66 @@
+﻿<table class="table table-flush table-striped table-hover" id="tabela"></table>
+
+<%- contentFor("scripts") %>
+<script type="text/javascript">
+	//<![CDATA[
+	"use strict";
+
+	var tabela = prepareDataTable("tabela", {
+		order: [[1, "asc"]],
+		deferRender: true,
+		columns: [
+			{ title: "", "class": "col-min", searchable: false, orderable: false, data: "id", render: function (v, type, row) { return '<a target="_blank" title="Editar" href="<%- root %>/local/editar?id=' + row.id + '" class="btn btn-sm btn-outline-primary"><i class="fa fa-fw fa-edit"></i></a> <button title="Excluir" type="button" data-excluir="1" class="btn btn-sm btn-outline-danger"><i class="fa fa-fw fa-times"></i></button>'; } },
+			{ title: "Nome", render: encode, data: "nome" },
+			{ title: "Nome Curto", render: encode, data: "nome_curto" },
+			{ title: "Prédio", render: encode, data: "predio" },
+			{ title: "Usuário", render: encode, data: "usuario" },
+			{ title: "Criação", "class": "col-min text-right", "type": "customdateint", data: "criacao" }
+		],
+		data: <%- JSON.stringify(lista) %>,
+		export: { xlsx: true, title: "Locais" }
+	});
+
+	$("#tabela").on("click", "tbody button", function () {
+		if (JsonWebApi.active)
+			return;
+
+		var trClicada = this.parentNode.parentNode,
+			nome = null,
+			local = tabela.row(trClicada).data();
+
+		if (this.getAttribute("data-excluir")) {
+			Swal.okcancel({
+				html: 'Tem certeza que deseja excluir o local "' + local.nome + '"? Esta operação NÃO pode ser desfeita!<br/><br/>Para confirmar a exclusão, por favor, digite abaixo o nome do local conforme exibido acima.<br/><br/><label for="txtExcluirNome">Nome do local</label><input type="text" class="form-control" spellcheck="false" autocomplete="off" id="txtExcluirNome" />',
+				confirmButtonText: "Excluir",
+				preConfirm: function () {
+					nome = $("#txtExcluirNome").val().toLowerCase();
+					return true;
+				}
+			}, null, true).then(function (result) {
+				if (JsonWebApi.active || !trClicada)
+					return;
+
+				if (result.value) {
+					if (nome !== local.nome.toLowerCase()) {
+						Swal.error("O nome do local não confere! " + emoji.sad);
+						return;
+					}
+
+					Swal.wait();
+
+					JsonWebApi.delete("<%- root %>/api/local/excluir", function (response) {
+						if (response.success) {
+							Swal.success("Local excluído com sucesso! " + emoji.happy);
+							tabela.row(trClicada).remove().draw();
+						} else {
+							Swal.error(response.value + " " + emoji.sad);
+						}
+						trClicada = null;
+					}, "id", local.id);
+				}
+			});
+		}
+	});
+
+	//]]>
+</script>

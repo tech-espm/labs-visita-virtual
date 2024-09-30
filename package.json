@@ -13,7 +13,7 @@
   "main": "src/app.js",
   "dependencies": {
     "dotenv": "16.0.1",
-    "teem": "0.0.25"
+    "teem": "0.0.26"
   },
   "devDependencies": {
     "@types/express": "4.17.13",

@@ -27,5 +27,6 @@ export = {
 	// Não utilizar números > 0x7FFFFFFF, pois os XOR resultarão em -1
 	usuarioHashId: parseInt(process.env.app_usuarioHashId as string),
 	ssoRedir: process.env.app_ssoRedir as string,
-	ssoToken: process.env.app_ssoToken as string
+	ssoToken: process.env.app_ssoToken as string,
+	pastaLocais: process.env.app_pastaLocais as string,
 };

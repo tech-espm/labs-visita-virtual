@@ -9,14 +9,14 @@
 		order: [[1, "asc"]],
 		deferRender: true,
 		columns: [
-			{ title: "", "class": "col-min", searchable: false, orderable: false, data: "id", render: function (v, type, row) { return '<a target="_blank" title="Editar" href="<%- root %>/usuario/editar?id=' + row.id + '" class="btn btn-sm btn-outline-primary"><i class="fa fa-fw fa-edit"></i></a> <button title="Excluir" type="button" data-excluir="1" class="btn btn-sm btn-outline-danger"><i class="fa fa-fw fa-times"></i></button>'; } },
-			{ title: "E-mail", render: encode, data: "email" },
+			{ title: "", "class": "col-min", searchable: false, orderable: false, data: "id", render: function (v, type, row) { return '<a target="_blank" title="Editar" href="<%- root %>/predio/editar?id=' + row.id + '" class="btn btn-sm btn-outline-primary"><i class="fa fa-fw fa-edit"></i></a> <a target="_blank" title="Visitar" href="<%- root %>/visita/' + row.url + '" class="btn btn-sm btn-outline-success"><i class="fa fa-fw fa-external-link-alt"></i></a> <button title="Excluir" type="button" data-excluir="1" class="btn btn-sm btn-outline-danger"><i class="fa fa-fw fa-times"></i></button>'; } },
 			{ title: "Nome", render: encode, data: "nome" },
-			{ title: "Perfil", render: encode, data: "perfil" },
+			{ title: "URL", render: encode, data: "url" },
+			{ title: "Usuário", render: encode, data: "usuario" },
 			{ title: "Criação", "class": "col-min text-right", "type": "customdateint", data: "criacao" }
 		],
 		data: <%- JSON.stringify(lista) %>,
-		export: { title: "Usuários" }
+		export: { xlsx: true, title: "Prédios" }
 	});
 
 	$("#tabela").on("click", "tbody button", function () {
@@ -24,15 +24,15 @@
 			return;
 
 		var trClicada = this.parentNode.parentNode,
-			email = null,
-			usuario = tabela.row(trClicada).data();
+			nome = null,
+			predio = tabela.row(trClicada).data();
 
 		if (this.getAttribute("data-excluir")) {
 			Swal.okcancel({
-				html: 'Tem certeza que deseja excluir o usuário "' + usuario.email + '"? Esta operação NÃO pode ser desfeita!<br/><br/>Para confirmar a exclusão, por favor, digite abaixo o e-mail do usuário conforme exibido acima.<br/><br/><label for="txtExcluirEmail">E-mail do usuário</label><input type="text" class="form-control" spellcheck="false" autocomplete="off" id="txtExcluirEmail" />',
+				html: 'Tem certeza que deseja excluir o prédio "' + predio.nome + '"? Esta operação NÃO pode ser desfeita!<br/><br/>Para confirmar a exclusão, por favor, digite abaixo o nome do prédio conforme exibido acima.<br/><br/><label for="txtExcluirNome">Nome do prédio</label><input type="text" class="form-control" spellcheck="false" autocomplete="off" id="txtExcluirNome" />',
 				confirmButtonText: "Excluir",
 				preConfirm: function () {
-					email = $("#txtExcluirEmail").val().toLowerCase();
+					nome = $("#txtExcluirNome").val().toLowerCase();
 					return true;
 				}
 			}, null, true).then(function (result) {
@@ -40,22 +40,22 @@
 					return;
 
 				if (result.value) {
-					if (email !== usuario.email.toLowerCase()) {
-						Swal.error("O e-mail do usuário não confere! " + emoji.sad);
+					if (nome !== predio.nome.toLowerCase()) {
+						Swal.error("O nome do prédio não confere! " + emoji.sad);
 						return;
 					}
 
 					Swal.wait();
 
-					JsonWebApi.delete("<%- root %>/api/usuario/excluir", function (response) {
+					JsonWebApi.delete("<%- root %>/api/predio/excluir", function (response) {
 						if (response.success) {
-							Swal.success("Usuário excluído com sucesso! " + emoji.happy);
+							Swal.success("Prédio excluído com sucesso! " + emoji.happy);
 							tabela.row(trClicada).remove().draw();
 						} else {
 							Swal.error(response.value + " " + emoji.sad);
 						}
 						trClicada = null;
-					}, "id", usuario.id);
+					}, "id", predio.id);
 				}
 			});
 		}

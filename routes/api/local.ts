@@ -1,55 +1,64 @@
 import app = require("teem");
-import Perfil = require("../../enums/perfil");
+import Local = require("../../models/local");
 import Usuario = require("../../models/usuario");
 
-class LocalApi {
-    @app.http.post()
-    @app.route.formData()
-    public static async criarLocal(req: app.Request, res: app.Response) {
-        let local = req.body;
-        let imagem = req.uploadedFiles["imagem"];
+class LocalRoute {
+	@app.http.post()
+	@app.route.formData()
+	public static async criar(req: app.Request, res: app.Response) {
+		const u = await Usuario.cookie(req, res, true);
+		if (!u)
+			return;
 
-        const u = await Usuario.cookie(req, res);
-        if (!u) return;
+		const erro = await Local.criar(req.body, u.id, req.uploadedFiles?.imagem);
 
-        await app.sql.connect(async (sql: app.Sql) => {
-            try {
-                await sql.beginTransaction();
+		if (erro) {
+			res.status(400).json(erro);
+			return;
+		}
 
-                await sql.query(
-                    "INSERT INTO local (nomeLocal, nomeCurto, versao, rgb) VALUES (?, ?, ?, ?)", 
-                    [local.nome, local.nomeCurto, local.versao, local.rgb]
-                );
+		res.sendStatus(204);
+	}
 
-                let idVisita = await sql.scalar("SELECT last_insert_id()");
+	@app.http.post()
+	@app.route.formData()
+	public static async editar(req: app.Request, res: app.Response) {
+		const u = await Usuario.cookie(req, res, true);
+		if (!u)
+			return;
 
-                if (imagem) { 
-                    app.fileSystem.saveUploadedFile("/public/img/locais/" + idVisita + ".jpg", imagem);
-                }
+		const erro = await Local.editar(req.body, req.uploadedFiles?.imagem);
 
-                await sql.commit();
-                res.json(true);
-            } catch (error) {
-                await sql.rollback();
-                console.error(error); 
-                res.status(500).json({ error: "Erro interno no servidor." });
-            }
-        });
-    }
+		if (erro) {
+			res.status(400).json(erro);
+			return;
+		}
 
+		res.sendStatus(204);
+	}
 
-    public async listarPredio(req: app.Request, res: app.Response) {
-		let predio: any[];
+	@app.http.delete()
+	public static async excluir(req: app.Request, res: app.Response) {
+		const u = await Usuario.cookie(req, res, true);
+		if (!u)
+			return;
 
-		await app.sql.connect(async (sql: app.Sql) => {
-            predio = await sql.query("SELECT id, nome FROM predio;");
-        });
+		const id = parseInt(req.query["id"] as string);
 
-		res.render("exemplo/local", {
-			predio: predio
-		});
-	};
+		if (isNaN(id)) {
+			res.status(400).json("Id inválido");
+			return;
+		}
 
+		const erro = await Local.excluir(id);
+
+		if (erro) {
+			res.status(400).json(erro);
+			return;
+		}
+
+		res.sendStatus(204);
+	}
 }
 
-export = LocalApi;
+export = LocalRoute;

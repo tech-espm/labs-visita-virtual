@@ -1,0 +1,105 @@
+﻿<input type="hidden" id="id" name="id" value="<%=(item ? item.id : 0) %>" />
+
+<div class="row">
+	<div class="col-sm-6">
+		<div class="form-group">
+			<label for="nome">Nome</label>
+			<input id="nome" name="nome" maxlength="50" class="form-control" type="text" spellcheck="false" value="<%=(item ? item.nome : '') %>" />
+		</div>
+	</div>
+
+	<div class="col-sm-6">
+		<div class="form-group">
+			<label for="nome_curto">Nome Curto</label>
+			<input id="nome_curto" name="nome_curto" maxlength="50" class="form-control" type="text" spellcheck="false" value="<%=(item ? item.nome_curto : '') %>" />
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-sm-9">
+		<div class="form-group">
+			<label for="idpredio">Prédio</label>
+			<div class="cb-search">
+				<select id="idpredio" name="idpredio" class="form-control">
+					<option value="" hidden>Selecione...</option>
+					<% for (let i = 0; i < predios.length; i++) { %>
+					<option value="<%- predios[i].id %>" <%- ((item && item.idpredio === predios[i].id) ? 'selected="selected"' : '') %>><%= predios[i].nome %></option>
+					<% } %>
+				</select>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-sm-3">
+		<div class="form-group">
+			<label for="rgb">Cor</label>
+			<input id="rgb" name="rgb" class="form-control" type="color" value="<%=(item ? item.rgb : '#ffffff') %>" />
+		</div>
+	</div>
+</div>
+
+<div class="form-group mb-0">
+	<label for="imagem">Imagem</label>
+	<input id="imagem" name="imagem" class="form-control" type="file" accept="image/jpeg" />
+</div>
+
+<%- contentFor("scripts") %>
+<script type="text/javascript">
+	//<![CDATA[
+	"use strict";
+
+	prepareCbSearch(document.getElementById("idpredio"));
+
+	$("#form").validate({
+		rules: {
+			nome: {
+				required: true
+			},
+			nome_curto: {
+				required: true
+			},
+			idpredio: {
+				required: true
+			},
+			rgb: {
+				required: true
+			},
+			//<% if (!item) { %>
+			imagem: {
+				required: true
+			},
+			//<% } %>
+		},
+
+		submitHandler: function (form) {
+			if (JsonWebApi.active)
+				return;
+
+			Swal.wait();
+
+			//<% if (item) { %>
+
+			JsonWebApi.postFormData("<%- root %>/api/local/editar", new FormData(form), function (response) {
+				if (response.success)
+					Swal.success("Local alterado com sucesso! " + emoji.happy);
+				else
+					Swal.error(response.value + " " + emoji.sad);
+			});
+
+			//<% } else { %>
+
+			JsonWebApi.postFormData("<%- root %>/api/local/criar", new FormData(form), function (response) {
+				if (response.success) {
+					resetForm("#form");
+					Swal.success("Local criado com sucesso! " + emoji.happy);
+				} else {
+					Swal.error(response.value + " " + emoji.sad);
+				}
+			});
+
+			//<% } %>
+		}
+	});
+	//]]>
+</script>
