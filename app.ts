@@ -9,6 +9,7 @@ app.run({
 
 	onInit: function () {
 		app.express.locals.Perfil = Perfil;
+		app.express.locals.pastaLocais = appsettings.pastaLocais;
 	},
 
 	htmlErrorHandler: function (err: any, req: app.Request, res: app.Response, next: app.NextFunction) {
