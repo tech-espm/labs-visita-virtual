@@ -1,0 +1,64 @@
+﻿<input type="hidden" id="id" name="id" value="<%=(item ? item.id : 0) %>" />
+
+<div class="row">
+	<div class="col-sm-6">
+		<div class="form-group">
+			<label for="nome">Nome</label>
+			<input id="nome" name="nome" maxlength="85" class="form-control" type="nome" spellcheck="false" value="<%=(item ? item.nome : '') %>" <%=(item ? 'readonly="readonly"' : '') %> />
+		</div>
+	</div>
+
+	<div class="col-sm-6">
+		<div class="form-group">
+			<label for="url">URL</label>
+			<input id="url" name="url" maxlength="100" class="form-control" type="text" spellcheck="false" value="<%=(item ? item.url : '') %>" />
+		</div>
+	</div>
+</div>
+
+<%- contentFor("scripts") %>
+<script type="text/javascript">
+	//<![CDATA[
+	"use strict";
+
+	$("#form").validate({
+		rules: {
+			nome: {
+				required: true
+			},
+			url: {
+				required: true
+			}
+		},
+
+		submitHandler: function (form) {
+			if (JsonWebApi.active)
+				return;
+
+			Swal.wait();
+
+			//<% if (item) { %>
+
+			JsonWebApi.postFormData("<%- root %>/api/predio/editar", form, function (response) {
+				if (response.success)
+					Swal.success("Usuário alterado com sucesso! " + emoji.happy);
+				else
+					Swal.error(response.value + " " + emoji.sad);
+			});
+
+			//<% } else { %>
+
+			JsonWebApi.postFormData("<%- root %>/api/predio/criarPost", form, function (response) {
+				if (response.success) {
+					resetForm("#form");
+					Swal.success("Usuário criado com sucesso! " + emoji.happy);
+				} else {
+					Swal.error(response.value + " " + emoji.sad);
+				}
+			});
+
+			//<% } %>
+		}
+	});
+	//]]>
+</script>
