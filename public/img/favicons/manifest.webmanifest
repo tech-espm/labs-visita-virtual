@@ -1,8 +1,8 @@
 {
 	"name": "Gerenciador de Visitas a Ambientes Virtuais",
 	"short_name": "Gerenciador de Visitas a Ambientes Virtuais",
-	"start_url": "/lifelab",
-	"id": "/lifelab",
+	"start_url": "/visita",
+	"id": "/visita",
 	"dir": "ltr",
 	"lang": "pt-BR",
 	"orientation": "portrait-primary",

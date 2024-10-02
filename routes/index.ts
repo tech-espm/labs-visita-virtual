@@ -65,7 +65,7 @@ class IndexRoute {
 		res.redirect(app.root + "/");
 	}
 
-	@app.route.methodName("predio/:id")
+	@app.route.methodName("virtual/:id")
 	public static async visita(req: app.Request, res: app.Response) {
 		res.render("index/visita", {
 			layout: "layout-vazio",
