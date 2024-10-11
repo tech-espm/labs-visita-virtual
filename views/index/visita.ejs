@@ -1,59 +1,58 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<%- include("../favicon") %>
+	<link rel="manifest" href="<%- root %>/app/<%- predio.url %>/manifest.webmanifest" />
 
-    <title><%= predio.nome %> - Visita Virtual ESPM</title>
+	<title><%= predio.nome %> - Visita Virtual ESPM</title>
 
-    <!--
+	<!--
 		Babylon.js 6.22.1
 		https://github.com/BabylonJS/Babylon.js/releases/download/6.22.1/cdnSnapshot.zip
 	-->
-    <!--
+	<!--
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
-    <script src="https://assets.babylonjs.com/generated/Assets.js"></script>
+	<script src="https://assets.babylonjs.com/generated/Assets.js"></script>
 	-->
-    <script src="<%- staticRoot %>/lib/babylonjs/recast.js"></script>
-    <script src="<%- staticRoot %>/lib/babylonjs/ammo.js"></script>
-    <script src="<%- staticRoot %>/lib/babylonjs/havok/HavokPhysics_umd.js"></script>
-    <script src="<%- staticRoot %>/lib/babylonjs/cannon.js"></script>
-    <script src="<%- staticRoot %>/lib/babylonjs/Oimo.js"></script>
-    <script src="<%- staticRoot %>/lib/babylonjs/earcut.min.js"></script>
-    <script src="<%- staticRoot %>/lib/babylonjs/babylon.js"></script>
-    <script src="<%- staticRoot %>/lib/babylonjs/materialsLibrary/babylonjs.materials.min.js"></script>
-    <script src="<%- staticRoot %>/lib/babylonjs/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js"></script>
-    <script src="<%- staticRoot %>/lib/babylonjs/postProcessesLibrary/babylonjs.postProcess.min.js"></script>
-    <script src="<%- staticRoot %>/lib/babylonjs/loaders/babylonjs.loaders.js"></script>
-    <script src="<%- staticRoot %>/lib/babylonjs/serializers/babylonjs.serializers.min.js"></script>
-    <script src="<%- staticRoot %>/lib/babylonjs/gui/babylon.gui.min.js"></script>
-    <script src="<%- staticRoot %>/lib/babylonjs/inspector/babylon.inspector.bundle.js"></script>
+	<script src="<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/recast.js"></script>
+	<script src="<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/ammo.js"></script>
+	<script src="<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/havok/HavokPhysics_umd.js"></script>
+	<script src="<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/cannon.js"></script>
+	<script src="<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/Oimo.js"></script>
+	<script src="<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/earcut.min.js"></script>
+	<script src="<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/babylon.js"></script>
+	<script src="<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/materialsLibrary/babylonjs.materials.min.js"></script>
+	<script src="<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js"></script>
+	<script src="<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/postProcessesLibrary/babylonjs.postProcess.min.js"></script>
+	<script src="<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/loaders/babylonjs.loaders.js"></script>
+	<script src="<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/serializers/babylonjs.serializers.min.js"></script>
+	<script src="<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/gui/babylon.gui.min.js"></script>
+	<script src="<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/inspector/babylon.inspector.bundle.js"></script>
 
-    <style>
-        html,
-        body {
-            overflow: hidden;
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
+	<style>
+		html,
+		body {
+			overflow: hidden;
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
 
-        #renderCanvas {
-            width: 100%;
-            height: 100%;
-            touch-action: none;
-        }
+		#renderCanvas {
+			width: 100%;
+			height: 100%;
+			touch-action: none;
+		}
 
-        #canvasZone {
-            width: 100%;
-            height: 100%;
-        }
-    </style>
+		#canvasZone {
+			width: 100%;
+			height: 100%;
+		}
+	</style>
 </head>
 <body>
-    <div id="canvasZone"><canvas id="renderCanvas"></canvas></div>
+	<div id="canvasZone"><canvas id="renderCanvas"></canvas></div>
 	<script type="text/javascript">
 		//<![CDATA[
 		"use strict";
@@ -62,6 +61,36 @@
 
 		//]]>
 	</script>
-    <script src="<%- staticRoot %>/js/visita.js"></script>
+	<script src="<%- staticRoot %>/js/visita.js"></script>
+
+	<% if (offline) { %>
+	<script type="text/javascript">
+		//<![CDATA[
+		"use strict";
+		if ("serviceWorker" in navigator) {
+			const promise = navigator.serviceWorker.register("<%- root %>/app/<%- predio.url %>/sw.js");
+			if (promise && ("then" in promise)) {
+				promise.then(function (registration) {
+					if (registration && ("onupdatefound" in registration) && registration.active) {
+						registration.onupdatefound = function () {
+							Modal.show({
+								html: Strings.PleaseRefresh,
+								title: Strings.UpdateAvailable,
+								returnFocusElement: AppUI.playlistControlElement,
+								okText: Strings.Refresh,
+								okCancel: true,
+								onok: function () {
+									window.location.reload();
+								}
+							});
+						};
+					}
+				});
+			}
+		}
+
+		//]]>
+	</script>
+	<% } %>
 </body>
 </html>

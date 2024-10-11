@@ -1,0 +1,101 @@
+"use strict";
+
+const CACHE_PREFIX = "espm-visita-virtual-static-cache";
+const CACHE_VERSION = "-20241011-";
+//<% let versaoImagens = 0; for (let i = 0; i < predio.locais.length; i++) { versaoImagens += predio.locais[i].versao; } %>
+const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION + "<%- versaoImagens %>";
+
+self.addEventListener("install", function (e) {
+	self.skipWaiting();
+
+	e.waitUntil(caches.open(CACHE_NAME).then((cache) => {
+		const files = [
+			"<%- root %>/app/<%- predio.url %>/assets/img/logo.png",
+			"<%- root %>/app/<%- predio.url %>/assets/img/favicons/favicon.png",
+			"<%- root %>/app/<%- predio.url %>/assets/img/favicons/favicon-512x512.png",
+			"<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/recast.js",
+			"<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/ammo.js",
+			"<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/havok/HavokPhysics_umd.js",
+			"<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/cannon.js",
+			"<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/Oimo.js",
+			"<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/earcut.min.js",
+			"<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/babylon.js",
+			"<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/materialsLibrary/babylonjs.materials.min.js",
+			"<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js",
+			"<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/postProcessesLibrary/babylonjs.postProcess.min.js",
+			"<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/loaders/babylonjs.loaders.js",
+			"<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/serializers/babylonjs.serializers.min.js",
+			"<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/gui/babylon.gui.min.js",
+			"<%- root %>/app/<%- predio.url %>/assets/lib/babylonjs/inspector/babylon.inspector.bundle.js",
+			//<% for (let i = 0; i < predio.locais.length; i++) { %>
+			"<%- predio.locais[i].url %>",
+			//<% } %>
+			"<%- root %>/app/<%- predio.url %>/",
+			"<%- root %>/app/<%- predio.url %>/?webxr",
+			"<%- root %>/app/<%- predio.url %>/manifest.webmanifest",
+		];
+		const promises = new Array(files.length);
+		for (let i = files.length - 1; i >= 0; i--)
+			promises[i] = cache.add(new Request(files[i], { cache: "no-store" }));
+		return Promise.all(promises);
+	}));
+});
+
+self.addEventListener("activate", function (e) {
+	self.clients.claim();
+
+	e.waitUntil(
+		// List all cache storages in our domain.
+		caches.keys().then(function (keyList) {
+			// Create one Promise for deleting each cache storage that is not
+			// our current cache storage, taking care not to delete other
+			// cache storages from the domain by checking the key prefix (we
+			// are not using map() to avoid inserting undefined into the array).
+			const oldCachesPromises = [];
+
+			for (let i = keyList.length - 1; i >= 0; i--) {
+				const key = keyList[i];
+				if (key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+					oldCachesPromises.push(caches.delete(key));
+			}
+
+			return Promise.all(oldCachesPromises);
+		})
+	);
+});
+
+async function fetchResponse(url) {
+	const cache = await caches.open(CACHE_NAME);
+	let response = null;
+
+	try {
+		response = await cache.match(url, { ignoreVary: true });
+		if (response)
+			return response;
+
+		response = await fetch(url);
+		if (!response.ok)
+			response = null;
+	} catch (ex) {
+	}
+
+	if (response) {
+		try {
+			await cache.put(url, response.clone());
+		} catch (ex) {
+		}
+		return response;
+	}
+
+	if (url.indexOf("favicon") >= 0)
+		response = await cache.match("<%- staticRoot %>/img/favicons/favicon-512x512.png", { ignoreVary: true });
+
+	return (response || Response.error());
+}
+
+self.addEventListener("fetch", function (event) {
+	if (event.request.method !== "GET")
+		return;
+
+	event.respondWith(fetchResponse(event.request.url));
+});

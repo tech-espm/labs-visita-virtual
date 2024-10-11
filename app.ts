@@ -8,6 +8,7 @@ app.run({
 	sqlConfig: appsettings.sqlConfig,
 
 	onInit: function () {
+		app.express.locals.urlSite = appsettings.urlSite;
 		app.express.locals.Perfil = Perfil;
 		app.express.locals.pastaLocais = appsettings.pastaLocais;
 	},

@@ -69,7 +69,7 @@ class Predio {
 
 			if (predio.locais) {
 				for (let i = predio.locais.length - 1; i >= 0; i--) {
-					predio.locais[i].url = `${app.root}/imagem-local/${predio.locais[i].id}`;
+					predio.locais[i].url = `${app.root}/app/${predio.url}/imagem/${predio.locais[i].id}`;
 				}
 			}
 
