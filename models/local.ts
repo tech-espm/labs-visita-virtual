@@ -147,6 +147,16 @@ class Local {
 			return null;
 		});
 	}
+
+	public static async obterImagem(res: app.Response, id: number): Promise<void> {
+		const caminho = `public/img/${appsettings.pastaLocais}/${id}.jpg`;
+		if (!id || !(await app.fileSystem.exists(caminho))) {
+			res.status(404).send("Não encontrado");
+			return;
+		}
+
+		res.sendFile(app.fileSystem.absolutePath(caminho));
+	}
 }
 
 export = Local;

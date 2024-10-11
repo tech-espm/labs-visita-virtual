@@ -5,7 +5,7 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Visita Virtual ESPM</title>
+    <title><%= predio.nome %> - Visita Virtual ESPM</title>
 
     <!--
 		Babylon.js 6.22.1
@@ -54,9 +54,14 @@
 </head>
 <body>
     <div id="canvasZone"><canvas id="renderCanvas"></canvas></div>
-    <script>
-        
-    </script>
+	<script type="text/javascript">
+		//<![CDATA[
+		"use strict";
+
+		const predio = <%- JSON.stringify(predio) %>;
+
+		//]]>
+	</script>
     <script src="<%- staticRoot %>/js/visita.js"></script>
 </body>
 </html>

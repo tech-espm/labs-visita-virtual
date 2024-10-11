@@ -1,6 +1,8 @@
 ﻿import app = require("teem");
 import appsettings = require("../appsettings");
 import Usuario = require("../models/usuario");
+import Local = require("../models/local");
+import Predio = require("../models/predio");
 
 class IndexRoute {
 	public static async index(req: app.Request, res: app.Response) {
@@ -65,12 +67,25 @@ class IndexRoute {
 		res.redirect(app.root + "/");
 	}
 
-	@app.route.methodName("virtual/:id")
+	@app.route.methodName("imagem-local/:id")
+	public static async imagem(req: app.Request, res: app.Response) {
+		await Local.obterImagem(res, parseInt(req.params["id"]));
+	}
+
+	@app.route.methodName("virtual/:url")
 	public static async visita(req: app.Request, res: app.Response) {
-		res.render("index/visita", {
-			layout: "layout-vazio",
-			titulo: "Visita"
-		});
+		const url = req.params["url"];
+		let predio: Predio | null;
+		if (!url || !(predio = await Predio.obterPorUrl(url))) {
+			res.render("index/erro", { layout: "layout-externo", mensagem: "Não foi possível encontrar essa visita", erro: "Não foi possível encontrar essa visita" });
+		} else if (!predio.locais || !predio.locais.length) {
+			res.render("index/erro", { layout: "layout-externo", mensagem: "Não há locais cadastrados para essa visita", erro: "Não há locais cadastrados para essa visita" });
+		} else {
+			res.render("index/visita", {
+				layout: "layout-vazio",
+				predio
+			});
+		}
 	}
 }
 

@@ -9,6 +9,9 @@ interface Predio {
 	url: string;
 	criacao: string;
 	exclusao: string | null;
+
+	// Utilizado apenas para a visita
+	locais?: any[] | null;
 }
 
 class Predio {
@@ -50,6 +53,27 @@ class Predio {
 			const lista: Predio[] = await sql.query("select id, idusuario, nome, url, date_format(criacao, '%d/%m/%Y') criacao from predio where id = ? and exclusao is null", [id]);
 
 			return ((lista && lista[0]) || null);
+		});
+	}
+
+	public static obterPorUrl(url: string): Promise<Predio | null> {
+		return app.sql.connect(async (sql) => {
+			const lista: Predio[] = await sql.query("select id, nome, url from predio where url = ? and exclusao is null", [url || ""]);
+
+			if (!lista || !lista[0])
+				return null;
+
+			const predio = lista[0];
+
+			predio.locais = await sql.query("select id, nome, rgb, versao, nome_curto from local where exclusao is null and idpredio = ? order by nome asc", [predio.id]);
+
+			if (predio.locais) {
+				for (let i = predio.locais.length - 1; i >= 0; i--) {
+					predio.locais[i].url = `${app.root}/imagem-local/${predio.locais[i].id}`;
+				}
+			}
+
+			return predio;
 		});
 	}
 

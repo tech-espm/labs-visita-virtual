@@ -2,44 +2,7 @@
 
 const modoXR = (window.location.href.indexOf("webxr") >= 0);
 
-const imagens = [
-	{
-		url: "./textures/recepcao-jt.jpg",
-		nome: "Recepção (JT)"
-	},
-	{
-		url: "./textures/biblioteca-jt.jpg",
-		nome: "Biblioteca (JT)"
-	},
-	{
-		url: "./textures/coworking-jt.jpg",
-		nome: "Coworking (JT)"
-	},
-	{
-		url: "./textures/base-jt.jpg",
-		nome: "BASE (JT)"
-	},
-	{
-		url: "./textures/area-externa-jt.jpg",
-		nome: "Área Externa (JT)"
-	},
-	{
-		url: "./textures/3-andar-jt.jpg",
-		nome: "3º andar (JT)"
-	},
-	{
-		url: "./textures/sala-aula-6-andar-jt.jpg",
-		nome: "Sala 6º andar (JT)"
-	},
-	{
-		url: "./textures/auditorio-11-3-jt.jpg",
-		nome: "Auditório 11º andar (JT)"
-	},
-	{
-		url: "./textures/terraco-jt.jpg",
-		nome: "Terraço (JT)"
-	},
-];
+const imagens = predio.locais;
 
 let canvas = document.getElementById("renderCanvas");
 let engine = null;
@@ -52,8 +15,12 @@ let menu = null;
 let xrHelper = null;
 let botoesImagemXR = [];
 let botaoLocaisXR = null;
+const rgbPadrao = "#a80532";
 
-function criarBotao(nome, texto, callback) {
+function criarBotao(nome, texto, rgb, callback) {
+	if (!rgb || rgb.length !== 7)
+		rgb = rgbPadrao;
+
 	let botao;
 	if (modoXR) {
 		// Criando o botão Holográfico
@@ -68,7 +35,7 @@ function criarBotao(nome, texto, callback) {
 		const textBlock = new BABYLON.GUI.TextBlock();
 		textBlock.text = texto;
 		textBlock.color = "white"; // Cor do texto
-		textBlock.fontSize = 100; // Aumentando o tamanho da fonte no modo WebXR
+		textBlock.fontSize = 80; // Aumentando o tamanho da fonte no modo WebXR
 		textBlock.fontWeight = "bold"; // Deixando o texto em negrito
 		botao.content = textBlock;
 
@@ -82,19 +49,21 @@ function criarBotao(nome, texto, callback) {
 		//}, cena);
 
 		// Alterando a cor de fundo do botão
-		botao.mesh.material.albedoColor = new BABYLON.Color3(168 / 255, 5 / 255, 50 / 255);
-		//botao.mesh.material.albedoColor = BABYLON.Color3.FromHexString(corHexadecimal);
+		//botao.mesh.material.albedoColor = new BABYLON.Color3(parseInt(rgb.substring(1, 3), 16) / 255, parseInt(rgb.substring(3, 5), 16) / 255, parseInt(rgb.substring(5, 7), 16) / 255);
+		botao.mesh.material.albedoColor = BABYLON.Color3.FromHexString(rgb);
 	} else {
 		// Para o modo padrão (não XR)
 		botao = BABYLON.GUI.Button.CreateSimpleButton(nome, texto);
-		botao.paddingBottom = "30px";
-		botao.paddingRight = "30px";
-		botao.width = "160px";
-		botao.height = "80px";
+		//botao.paddingLeft = "15px";
+		//botao.paddingTop = "10px";
+		//botao.paddingRight = "15px";
+		//botao.paddingBottom = "10px";
+		botao.width = "200px";
+		botao.height = "48px";
 		botao.color = "white"; // Cor do texto
-		botao.background = "rgb(168, 5, 50)"; // Cor de fundo
+		botao.background = rgb; // Cor de fundo
 		// Estilo de texto no modo 2D
-		botao.fontSize = "24px";
+		botao.fontSize = "16px";
 		botao.fontWeight = "bold";
 		// Arredondar os cantos do botão 2D
 		botao.cornerRadius = 20;
@@ -105,7 +74,7 @@ function criarBotao(nome, texto, callback) {
 
 
 function criarBotaoImagem(indice) {
-	return criarBotao("botaoImagem" + indice, imagens[indice].nome, function () {
+	return criarBotao("botaoImagem" + indice, imagens[indice].nome_curto || imagens[indice].nome, imagens[indice].rgb, function () {
 		imagemAtual = indice;
 		if (!modoXR)
 			alternarMenu();
@@ -147,7 +116,7 @@ function criarBotoesMenuXR(visibilidadeBotoesImagem) {
 	menu.position.z = -2; // Move a esfera um pouco para a direita
 	menu.position.x = -4; // Move a esfera um pouco para trás
 	menu.blockLayout = true;
-	botaoLocaisXR = criarBotao("locais", "Locais", alternarMenu);
+	botaoLocaisXR = criarBotao("locais", "Locais", null, alternarMenu);
 	for (let i = 0; i < imagens.length; i++) {
 		const botao = criarBotaoImagem(i);
 		botao.isVisible = visibilidadeBotoesImagem;
@@ -216,7 +185,7 @@ function alternarMenu() {
 			}
 		}
 
-		const botao = criarBotao("botaoWebXR", "Modo WebXR", function () {
+		const botao = criarBotao("botaoWebXR", "Modo WebXR", null, function () {
 			window.location.href += "?webxr";
 		});
 		botao.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
@@ -252,7 +221,7 @@ async function criarCena() {
 	} else {
 		ui = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
-		const botao = criarBotao("locais", "Locais", alternarMenu);
+		const botao = criarBotao("locais", "Locais", null, alternarMenu);
 		botao.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
 		botao.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
 		ui.addControl(botao);
