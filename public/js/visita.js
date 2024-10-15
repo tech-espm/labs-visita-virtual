@@ -17,6 +17,27 @@ let botoesImagemXR = [];
 let botaoLocaisXR = null;
 const rgbPadrao = "#a80532";
 
+function relativeLuminance(rgb) {
+	if ((typeof rgb) === "string")
+		rgb = parseInt(rgb.replace("#", ""), 16);
+	rgb |= 0;
+	if (rgb < 0)
+		return 1;
+	//http://www.w3.org/TR/2007/WD-WCAG20-TECHS-20070517/Overview.html#G18
+	var RsRGB = ((rgb >>> 16) & 0xff) / 255.0,
+		GsRGB = ((rgb >>> 8) & 0xff) / 255.0,
+		BsRGB = (rgb & 0xff) / 255.0,
+		R, G, B;
+	if (RsRGB <= 0.03928) R = RsRGB / 12.92; else R = Math.pow((RsRGB + 0.055) / 1.055, 2.4);
+	if (GsRGB <= 0.03928) G = GsRGB / 12.92; else G = Math.pow((GsRGB + 0.055) / 1.055, 2.4);
+	if (BsRGB <= 0.03928) B = BsRGB / 12.92; else B = Math.pow((BsRGB + 0.055) / 1.055, 2.4);
+	return (0.2126 * R) + (0.7152 * G) + (0.0722 * B);
+}
+
+function textColorForBackground(rgb) {
+	return (relativeLuminance(rgb) < 0.4) ? "#ffffff" : "#000000";
+}
+
 function criarBotao(nome, texto, rgb, callback) {
 	if (!rgb || rgb.length !== 7)
 		rgb = rgbPadrao;
@@ -71,7 +92,6 @@ function criarBotao(nome, texto, rgb, callback) {
 	botao.onPointerDownObservable.add(callback);
 	return botao;
 }
-
 
 function criarBotaoImagem(indice) {
 	return criarBotao("botaoImagem" + indice, imagens[indice].nome_curto || imagens[indice].nome, imagens[indice].rgb, function () {
@@ -196,6 +216,57 @@ function alternarMenu() {
 	}
 }
 
+function criarMenuHTML() {
+	const divMenu = document.createElement("div");
+	divMenu.className = "menu";
+	divMenu.style.display = "none";
+
+	const divBotoes = document.createElement("div");
+	divBotoes.style.textAlign = "center";
+
+	const alternarMenuHTML = function () {
+		divMenu.style.display = ((divMenu.style.display == "none") ? "" : "none");
+	};
+
+	const criarBotaoHTML = function (pai, texto, rgb, callback) {
+		if (!rgb || rgb.length !== 7)
+			rgb = rgbPadrao;
+	
+		const botao = document.createElement("button");
+		botao.setAttribute("type", "button");
+		botao.onclick = callback;
+		botao.textContent = texto;
+		botao.style.backgroundColor = rgb;
+		botao.style.color = textColorForBackground(rgb);
+		botao.style.borderColor = botao.style.color;
+
+		pai.appendChild(botao);
+
+		return botao;
+	};
+
+	const criarBotaoImagemHTML = function (pai, indice) {
+		return criarBotaoHTML(pai, imagens[indice].nome_curto || imagens[indice].nome, imagens[indice].rgb, function () {
+			imagemAtual = indice;
+			alternarMenuHTML();
+			criarDomo(false);
+		});
+	};
+
+	const botaoLocais = criarBotaoHTML(document.body, "Locais", rgbPadrao, alternarMenuHTML);
+	botaoLocais.style.position = "fixed";
+	botaoLocais.style.zIndex = "3";
+	botaoLocais.style.left = "0.5rem";
+	botaoLocais.style.top = "0.5rem";
+
+	for (let i = 0; i < imagens.length; i++)
+		criarBotaoImagemHTML(divBotoes, i);
+
+	divMenu.appendChild(divBotoes);
+
+	document.body.appendChild(divMenu);
+}
+
 async function criarCena() {
 	cena = new BABYLON.Scene(engine);
 
@@ -219,12 +290,15 @@ async function criarCena() {
 		ui = new BABYLON.GUI.GUI3DManager(cena);
 		criarBotoesMenuXR(false);
 	} else {
+		criarMenuHTML();
+		/*
 		ui = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
 		const botao = criarBotao("locais", "Locais", null, alternarMenu);
 		botao.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
 		botao.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
 		ui.addControl(botao);
+		*/
 	}
 }
 

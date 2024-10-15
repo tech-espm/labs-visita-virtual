@@ -80,7 +80,7 @@ class IndexRoute {
 			if (manifest_webmanifest)
 				res.contentType("application/manifest+json");
 			else if (sw_js)
-				res.contentType("application/javascript");
+				res.contentType("text/javascript");
 
 			res.render(manifest_webmanifest ? "index/manifest" : (sw_js ? "index/sw" : "index/visita"), {
 				layout: "layout-vazio",
@@ -129,7 +129,7 @@ class IndexRoute {
 		return IndexRoute.visitaInterna(req, res, true, true, false);
 	}
 
-	@app.route.methodName("app/:url/sw.js")
+	@app.route.methodName("app/:url/sw")
 	public static async sw_js(req: app.Request, res: app.Response) {
 		return IndexRoute.visitaInterna(req, res, true, false, true);
 	}

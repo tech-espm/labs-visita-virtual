@@ -108,7 +108,23 @@ class Local {
 			try {
 				await sql.beginTransaction();
 
-				await sql.query(`update local set idpredio = ?, nome = ?, rgb = ?, nome_curto = ?${(imagem ? ", versao = versao + 1" : "")} where id = ? and exclusao is null`, [local.idpredio, local.nome, local.rgb, local.nome_curto, local.id]);
+				let alterarVersao = !!imagem;
+
+				if (!alterarVersao) {
+					const dadosAntigos: Local[] = await sql.query("select idpredio, nome, rgb, nome_curto from local where id = ? and exclusao is null", [local.id]);
+
+					if (!dadosAntigos || !dadosAntigos[0])
+						return "Local não encontrado";
+
+					alterarVersao = (
+						dadosAntigos[0].idpredio !== local.idpredio ||
+						dadosAntigos[0].nome !== local.nome ||
+						dadosAntigos[0].rgb !== local.rgb ||
+						dadosAntigos[0].nome_curto !== local.nome_curto
+					);
+				}
+
+				await sql.query(`update local set idpredio = ?, nome = ?, rgb = ?, nome_curto = ?${(alterarVersao ? ", versao = versao + 1" : "")} where id = ? and exclusao is null`, [local.idpredio, local.nome, local.rgb, local.nome_curto, local.id]);
 
 				if (!sql.affectedRows)
 					return "Local não encontrado";

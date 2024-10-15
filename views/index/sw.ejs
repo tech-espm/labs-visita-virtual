@@ -1,8 +1,8 @@
 "use strict";
 
 const CACHE_PREFIX = "espm-visita-virtual-static-cache";
-const CACHE_VERSION = "-20241011-";
-//<% let versaoImagens = 0; for (let i = 0; i < predio.locais.length; i++) { versaoImagens += predio.locais[i].versao; } %>
+const CACHE_VERSION = "-20241011";
+//<% let versaoImagens = ""; for (let i = 0; i < predio.locais.length; i++) { versaoImagens += `-${predio.locais[i].id}_${predio.locais[i].versao}`; } %>
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION + "<%- versaoImagens %>";
 
 self.addEventListener("install", function (e) {
@@ -94,7 +94,7 @@ async function fetchResponse(url) {
 }
 
 self.addEventListener("fetch", function (event) {
-	if (event.request.method !== "GET")
+	if (event.request.method !== "GET" || (event.request.url && event.request.url.indexOf("/sw") >= 0))
 		return;
 
 	event.respondWith(fetchResponse(event.request.url));
