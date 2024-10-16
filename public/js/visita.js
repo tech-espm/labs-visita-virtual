@@ -262,6 +262,12 @@ function criarMenuHTML() {
 	for (let i = 0; i < imagens.length; i++)
 		criarBotaoImagemHTML(divBotoes, i);
 
+	const divXR = document.createElement("div");
+	criarBotaoHTML(divXR, "Modo WebXR", null, function () {
+		window.location.href += "?webxr";
+	});
+	divBotoes.appendChild(divXR);
+
 	divMenu.appendChild(divBotoes);
 
 	document.body.appendChild(divMenu);
