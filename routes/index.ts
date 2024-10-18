@@ -142,7 +142,10 @@ class IndexRoute {
 	@app.route.methodName("app/:url/assets/:a?/:b?/:c?/:d?/:e?/:f?/:g?/:h?/:i?/:j?")
 	public static async assets(req: app.Request, res: app.Response) {
 		let url = req.originalUrl;
-		const i = url.indexOf("assets/");
+		let i = url.indexOf("?");
+		if (i >= 0)
+			url = url.substring(0, i);
+		i = url.indexOf("assets/");
 
 		if (i < 0 || !(url = url.substring(i + 7)) || !(await app.fileSystem.exists(url = ("public/" + url)))) {
 			res.status(404).json("Não encontrado");
