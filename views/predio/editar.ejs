@@ -48,7 +48,7 @@
 
 			JsonWebApi.postFormData("<%- root %>/api/predio/editar", form, function (response) {
 				if (response.success)
-					Swal.success("Prédio alterado com sucesso! " + emoji.happy);
+					Swal.success("Tour alterado com sucesso! " + emoji.happy);
 				else
 					Swal.error(response.value + " " + emoji.sad);
 			});
@@ -58,7 +58,7 @@
 			JsonWebApi.postFormData("<%- root %>/api/predio/criar", form, function (response) {
 				if (response.success) {
 					resetForm("#form");
-					Swal.success("Prédio criado com sucesso! " + emoji.happy);
+					Swal.success("Tour criado com sucesso! " + emoji.happy);
 				} else {
 					Swal.error(response.value + " " + emoji.sad);
 				}

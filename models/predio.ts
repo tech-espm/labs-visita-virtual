@@ -17,7 +17,7 @@ interface Predio {
 class Predio {
 	private static validar(predio: Predio, criacao: boolean): string | null {
 		if (!predio)
-			return "Prédio inválido";
+			return "Tour inválido";
 
 		predio.id = parseInt(predio.id as any);
 
@@ -111,7 +111,7 @@ class Predio {
 				await sql.query("update predio set nome = ?, url = ? where id = ? and exclusao is null", [predio.nome, predio.url, predio.id]);
 
 				if (!sql.affectedRows)
-					return "Prédio não encontrado";
+					return "Tour não encontrado";
 
 				return null;
 			} catch (ex: any) {
@@ -131,7 +131,7 @@ class Predio {
 			// não exista o prefixo, instr() vai retornar 0, que, com o + 1, faz o substr() retornar a própria string inteira)
 			await sql.query("update predio set url = concat('@', id, ':', url), exclusao = ? where id = ? and exclusao is null", [DataUtil.horarioDeBrasiliaISOComHorario(), id]);
 
-			return (sql.affectedRows ? null : "Prédio não encontrado");
+			return (sql.affectedRows ? null : "Tour não encontrado");
 		});
 	}
 }

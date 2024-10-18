@@ -16,7 +16,7 @@
 			{ title: "Criação", "class": "col-min text-right", "type": "customdateint", data: "criacao" }
 		],
 		data: <%- JSON.stringify(lista) %>,
-		export: { xlsx: true, title: "Prédios" }
+		export: { xlsx: true, title: "Tours" }
 	});
 
 	$("#tabela").on("click", "tbody button", function () {
@@ -29,7 +29,7 @@
 
 		if (this.getAttribute("data-excluir")) {
 			Swal.okcancel({
-				html: 'Tem certeza que deseja excluir o prédio "' + predio.nome + '"? Esta operação NÃO pode ser desfeita!<br/><br/>Para confirmar a exclusão, por favor, digite abaixo o nome do prédio conforme exibido acima.<br/><br/><label for="txtExcluirNome">Nome do prédio</label><input type="text" class="form-control" spellcheck="false" autocomplete="off" id="txtExcluirNome" />',
+				html: 'Tem certeza que deseja excluir o tour "' + predio.nome + '"? Esta operação NÃO pode ser desfeita!<br/><br/>Para confirmar a exclusão, por favor, digite abaixo o nome do tour conforme exibido acima.<br/><br/><label for="txtExcluirNome">Nome do tour</label><input type="text" class="form-control" spellcheck="false" autocomplete="off" id="txtExcluirNome" />',
 				confirmButtonText: "Excluir",
 				preConfirm: function () {
 					nome = $("#txtExcluirNome").val().toLowerCase();
@@ -41,7 +41,7 @@
 
 				if (result.value) {
 					if (nome !== predio.nome.toLowerCase()) {
-						Swal.error("O nome do prédio não confere! " + emoji.sad);
+						Swal.error("O nome do tour não confere! " + emoji.sad);
 						return;
 					}
 
@@ -49,7 +49,7 @@
 
 					JsonWebApi.delete("<%- root %>/api/predio/excluir", function (response) {
 						if (response.success) {
-							Swal.success("Prédio excluído com sucesso! " + emoji.happy);
+							Swal.success("Tour excluído com sucesso! " + emoji.happy);
 							tabela.row(trClicada).remove().draw();
 						} else {
 							Swal.error(response.value + " " + emoji.sad);

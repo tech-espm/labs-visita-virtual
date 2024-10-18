@@ -10,7 +10,7 @@ class PredioRoute {
       res.redirect(app.root + "/acesso");
     else
       res.render("predio/editar", {
-        titulo: "Criar Prédio",
+        titulo: "Criar Tour",
         textoSubmit: "Criar",
         usuario: u,
         item: null,
@@ -32,21 +32,21 @@ class PredioRoute {
         });
       } else
         res.render("predio/editar", {
-          titulo: "Editar Prédio",
+          titulo: "Editar Tour",
           usuario: u,
           item: item,
         });
     }
   }
 
-  // Renderiza a lista de prédios
+  // Renderiza a lista de tours
   public static async listar(req: app.Request, res: app.Response) {
     let u = await Usuario.cookie(req);
     if (!u || !u.admin) res.redirect(app.root + "/acesso");
     else
       res.render("predio/listar", {
         layout: "layout-tabela",
-        titulo: "Gerenciar Prédios",
+        titulo: "Gerenciar Tours",
         datatables: true,
         xlsx: true,
         usuario: u,

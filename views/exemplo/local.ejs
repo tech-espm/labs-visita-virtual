@@ -30,9 +30,9 @@
         <input type="color" class="form-control" name="rgb" id="rgb" />
     </div>
     <div class="form-group mb-3">
-        <label for="predio">Prédio</label>
+        <label for="predio">Tour</label>
         <select class="form-control" name="predio" id="predio">
-            <option value="" disabled selected>Selecione um prédio</option>
+            <option value="" disabled selected>Selecione um tour</option>
             <% for (let i = 0; i < predio.length; i++) { %>
                 <option value="<%= predio[i].id %>"><%= predio[i].nome %></option>
             <% } %>

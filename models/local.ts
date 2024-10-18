@@ -27,7 +27,7 @@ class Local {
 		}
 
 		if (!(local.idpredio = parseInt(local.idpredio as any)))
-			return "Prédio inválido";
+			return "Tour inválido";
 
 		if (!local.nome || !(local.nome = local.nome.normalize().trim()) || local.nome.length > 50)
 			return "Nome inválido";
@@ -83,7 +83,7 @@ class Local {
 				switch (ex.code) {
 					case "ER_NO_REFERENCED_ROW":
 					case "ER_NO_REFERENCED_ROW_2":
-						return "Usuário ou prédio não encontrado";
+						return "Usuário ou tour não encontrado";
 				}
 
 				throw ex;
@@ -139,7 +139,7 @@ class Local {
 				switch (ex.code) {
 					case "ER_NO_REFERENCED_ROW":
 					case "ER_NO_REFERENCED_ROW_2":
-						return "Usuário ou prédio não encontrado";
+						return "Usuário ou tour não encontrado";
 				}
 
 				throw ex;
