@@ -16,10 +16,56 @@
 	</div>
 </div>
 
+<% if (item && item.locais && item.locais.length) { %>
+<div class="table-responsive">
+	<table class="table table-striped table-hover ui-sortable mt-3 mb-0">
+		<thead>
+			<tr>
+				<th class="col-min">Ordem</th>
+				<th>Local</th>
+			</tr>
+		</thead>
+		<tbody id="tbodyLocais" class="secao-locais">
+			<% for (let i = 0; i < item.locais.length; i++) { %>
+			<tr class="ui-sortable-handle">
+				<td class="col-min local-enum"></td>
+				<td>
+					<input type="hidden" name="locais" value="<%- item.locais[i].id %>" />
+					<%= item.locais[i].nome %>
+				</td>
+			</tr>
+			<% } %>
+		</tbody>
+	</table>
+</div>
+<% } %>
+
+<%- contentFor("styles") %>
+<link rel="stylesheet" type="text/css" href="<%- staticRoot %>/lib/jquery-ui-1.13.2/jquery-ui.min.css" />
+
+<style type="text/css">
+	.secao-locais {
+		counter-reset: secao-locais;
+	}
+
+	.local-enum::before {
+		counter-increment: secao-locais;
+		content: counter(secao-locais);
+	}
+
+	.ui-sortable-handle {
+		cursor: move;
+	}
+</style>
+
 <%- contentFor("scripts") %>
+<script type="text/javascript" charset="utf-8" src="<%- staticRoot %>/lib/jquery-ui-1.13.2/jquery-ui.min.js"></script>
+
 <script type="text/javascript">
 	//<![CDATA[
 	"use strict";
+
+	$("#tbodyLocais").sortable().disableSelection();
 
 	$("#url").mask("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ", { translation: {
 			"Z": {

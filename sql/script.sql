@@ -51,6 +51,7 @@ CREATE TABLE local (
   nome VARCHAR(50) NOT NULL,
   rgb VARCHAR(10) NOT NULL,
   nome_curto VARCHAR(50) NOT NULL,
+  ordem INT NOT NULL DEFAULT 0,
   versao INT NOT NULL,
   criacao datetime NOT NULL,
   exclusao datetime NULL,

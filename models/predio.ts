@@ -48,11 +48,28 @@ class Predio {
 		});
 	}
 
+	private static async preencherLocais(sql: app.Sql, predio: Predio): Promise<void> {
+		predio.locais = await sql.query("select id, nome, rgb, versao, nome_curto from local where exclusao is null and idpredio = ? order by ordem asc", [predio.id]);
+
+		if (predio.locais) {
+			for (let i = predio.locais.length - 1; i >= 0; i--) {
+				predio.locais[i].url = `${app.root}/app/${predio.url}/imagem/${predio.locais[i].id}`;
+			}
+		}
+	}
+
 	public static obter(id: number): Promise<Predio | null> {
 		return app.sql.connect(async (sql) => {
 			const lista: Predio[] = await sql.query("select id, idusuario, nome, url, date_format(criacao, '%d/%m/%Y') criacao from predio where id = ? and exclusao is null", [id]);
 
-			return ((lista && lista[0]) || null);
+			if (!lista || !lista[0])
+				return null;
+
+			const predio = lista[0];
+
+			await Predio.preencherLocais(sql, predio);
+
+			return predio;
 		});
 	}
 
@@ -65,13 +82,7 @@ class Predio {
 
 			const predio = lista[0];
 
-			predio.locais = await sql.query("select id, nome, rgb, versao, nome_curto from local where exclusao is null and idpredio = ? order by nome asc", [predio.id]);
-
-			if (predio.locais) {
-				for (let i = predio.locais.length - 1; i >= 0; i--) {
-					predio.locais[i].url = `${app.root}/app/${predio.url}/imagem/${predio.locais[i].id}`;
-				}
-			}
+			await Predio.preencherLocais(sql, predio);
 
 			return predio;
 		});
@@ -108,10 +119,27 @@ class Predio {
 
 		return app.sql.connect(async (sql) => {
 			try {
+				await sql.beginTransaction();
+
 				await sql.query("update predio set nome = ?, url = ? where id = ? and exclusao is null", [predio.nome, predio.url, predio.id]);
 
 				if (!sql.affectedRows)
 					return "Tour não encontrado";
+
+				if (predio.locais) {
+					if (!Array.isArray(predio.locais))
+						predio.locais = [predio.locais];
+
+					for (let i = 0; i < predio.locais.length; i++) {
+						const idlocal = parseInt(predio.locais[i]);
+						if (!idlocal)
+							continue;
+
+						await sql.query("update local set ordem = ? where id = ?", [i, idlocal]);
+					}
+				}
+
+				await sql.commit();
 
 				return null;
 			} catch (ex: any) {
