@@ -22,13 +22,17 @@
 		<thead>
 			<tr>
 				<th class="col-min">Ordem</th>
+				<th class="col-min">Cor</th>
 				<th>Local</th>
 			</tr>
 		</thead>
 		<tbody id="tbodyLocais" class="secao-locais">
 			<% for (let i = 0; i < item.locais.length; i++) { %>
 			<tr class="ui-sortable-handle">
-				<td class="col-min local-enum"></td>
+				<td class="col-min text-center local-enum"></td>
+				<td class="col-min text-center">
+					<span style="background-color: <%- item.locais[i].rgb %>; display: inline-block; width: 1rem; height: 1rem; border-radius: 1rem; vertical-align: middle;"></span>
+				</td>
 				<td>
 					<input type="hidden" name="locais" value="<%- item.locais[i].id %>" />
 					<%= item.locais[i].nome %>
