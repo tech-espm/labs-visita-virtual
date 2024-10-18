@@ -13,7 +13,9 @@
 			{ title: "Nome", render: encode, data: "nome" },
 			{ title: "Nome Curto", render: encode, data: "nome_curto" },
 			{ title: "Tour", render: encode, data: "predio" },
+			//<% if (usuario.admin) { %>
 			{ title: "Usuário", render: encode, data: "usuario" },
+			//<% } %>
 			{ title: "Criação", "class": "col-min text-right", "type": "customdateint", data: "criacao" }
 		],
 		data: <%- JSON.stringify(lista) %>,

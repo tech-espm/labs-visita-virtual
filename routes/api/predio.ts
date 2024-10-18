@@ -5,7 +5,7 @@ import Usuario = require("../../models/usuario");
 class PredioRoute {
 	@app.http.post()
 	public static async criar(req: app.Request, res: app.Response) {
-		const u = await Usuario.cookie(req, res, true);
+		const u = await Usuario.cookie(req, res);
 		if (!u)
 			return;
 
@@ -21,11 +21,11 @@ class PredioRoute {
 
 	@app.http.post()
 	public static async editar(req: app.Request, res: app.Response) {
-		const u = await Usuario.cookie(req, res, true);
+		const u = await Usuario.cookie(req, res);
 		if (!u)
 			return;
 
-		const erro = await Predio.editar(req.body);
+		const erro = await Predio.editar(req.body, u.id, u.idperfil);
 
 		if (erro) {
 			res.status(400).json(erro);
@@ -37,7 +37,7 @@ class PredioRoute {
 
 	@app.http.delete()
 	public static async excluir(req: app.Request, res: app.Response) {
-		const u = await Usuario.cookie(req, res, true);
+		const u = await Usuario.cookie(req, res);
 		if (!u)
 			return;
 
@@ -48,7 +48,7 @@ class PredioRoute {
 			return;
 		}
 
-		const erro = await Predio.excluir(id);
+		const erro = await Predio.excluir(id, u.id, u.idperfil);
 
 		if (erro) {
 			res.status(400).json(erro);

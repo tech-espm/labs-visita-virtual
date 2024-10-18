@@ -6,11 +6,11 @@ class LocalRoute {
 	@app.http.post()
 	@app.route.formData()
 	public static async criar(req: app.Request, res: app.Response) {
-		const u = await Usuario.cookie(req, res, true);
+		const u = await Usuario.cookie(req, res);
 		if (!u)
 			return;
 
-		const erro = await Local.criar(req.body, u.id, req.uploadedFiles?.imagem);
+		const erro = await Local.criar(req.body, u.id, u.idperfil, req.uploadedFiles?.imagem);
 
 		if (erro) {
 			res.status(400).json(erro);
@@ -23,11 +23,11 @@ class LocalRoute {
 	@app.http.post()
 	@app.route.formData()
 	public static async editar(req: app.Request, res: app.Response) {
-		const u = await Usuario.cookie(req, res, true);
+		const u = await Usuario.cookie(req, res);
 		if (!u)
 			return;
 
-		const erro = await Local.editar(req.body, req.uploadedFiles?.imagem);
+		const erro = await Local.editar(req.body, u.id, u.idperfil, req.uploadedFiles?.imagem);
 
 		if (erro) {
 			res.status(400).json(erro);
@@ -39,7 +39,7 @@ class LocalRoute {
 
 	@app.http.delete()
 	public static async excluir(req: app.Request, res: app.Response) {
-		const u = await Usuario.cookie(req, res, true);
+		const u = await Usuario.cookie(req, res);
 		if (!u)
 			return;
 
@@ -50,7 +50,7 @@ class LocalRoute {
 			return;
 		}
 
-		const erro = await Local.excluir(id);
+		const erro = await Local.excluir(id, u.id, u.idperfil);
 
 		if (erro) {
 			res.status(400).json(erro);

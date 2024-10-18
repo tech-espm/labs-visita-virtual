@@ -7,7 +7,7 @@ class LocalRoute {
   // Renderiza a página de criação
   public static async criar(req: app.Request, res: app.Response) {
     let u = await Usuario.cookie(req);
-    if (!u || !u.admin)
+    if (!u)
       res.redirect(app.root + "/acesso");
     else
       res.render("local/editar", {
@@ -15,19 +15,19 @@ class LocalRoute {
         textoSubmit: "Criar",
         usuario: u,
         item: null,
-        predios: await Predio.listarCombo(),
+        predios: await Predio.listarCombo(u.id, u.idperfil),
       });
   }
 
   // Renderiza a página de edição
   public static async editar(req: app.Request, res: app.Response) {
     let u = await Usuario.cookie(req);
-    if (!u || !u.admin) {
+    if (!u) {
       res.redirect(app.root + "/acesso");
     } else {
       let id = parseInt(req.query["id"] as string);
       let item: any = null;
-      if (isNaN(id) || !(item = await Local.obter(id))) {
+      if (isNaN(id) || !(item = await Local.obter(id, u.id, u.idperfil))) {
         res.render("index/nao-encontrado", {
           layout: "layout-sem-form",
           usuario: u,
@@ -37,7 +37,7 @@ class LocalRoute {
           titulo: "Editar Local",
           usuario: u,
           item: item,
-          predios: await Predio.listarCombo(),
+          predios: await Predio.listarCombo(u.id, u.idperfil),
         });
     }
   }
@@ -45,7 +45,8 @@ class LocalRoute {
   // Renderiza a lista de locais
   public static async listar(req: app.Request, res: app.Response) {
     let u = await Usuario.cookie(req);
-    if (!u || !u.admin) res.redirect(app.root + "/acesso");
+    if (!u)
+      res.redirect(app.root + "/acesso");
     else
       res.render("local/listar", {
         layout: "layout-tabela",
@@ -53,7 +54,7 @@ class LocalRoute {
         datatables: true,
         xlsx: true,
         usuario: u,
-        lista: await Local.listar(),
+        lista: await Local.listar(u.id, u.idperfil),
       });
   }
 }

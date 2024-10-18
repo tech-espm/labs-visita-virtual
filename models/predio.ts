@@ -1,6 +1,7 @@
 import app = require("teem");
 import appsettings = require("../appsettings");
 import DataUtil = require("../utils/dataUtil");
+import Perfil = require("../enums/perfil");
 
 interface Predio {
 	id: number;
@@ -36,15 +37,21 @@ class Predio {
 		return null;
 	}
 
-	public static listar(): Promise<Predio[]> {
+	public static listar(idusuario: number, idperfil: Perfil): Promise<Predio[]> {
 		return app.sql.connect(async (sql) => {
-			return (await sql.query("select p.id, p.nome, p.url, p.idusuario, u.nome usuario, date_format(p.criacao, '%d/%m/%Y') criacao from predio p inner join usuario u on u.id = p.idusuario where p.exclusao is null")) || [];
+			return (await sql.query(
+				"select p.id, p.nome, p.url, p.idusuario, u.nome usuario, date_format(p.criacao, '%d/%m/%Y') criacao from predio p inner join usuario u on u.id = p.idusuario where p.exclusao is null" + (idperfil === Perfil.Administrador ? "" : " and p.idusuario = ?"),
+				(idperfil === Perfil.Administrador ? [] : [idusuario])
+			)) || [];
 		});
 	}
 
-	public static listarCombo(): Promise<Predio[]> {
+	public static listarCombo(idusuario: number, idperfil: Perfil): Promise<Predio[]> {
 		return app.sql.connect(async (sql) => {
-			return (await sql.query("select id, nome from predio where exclusao is null order by nome asc")) || [];
+			return (await sql.query(
+				"select id, nome from predio where exclusao is null" + (idperfil === Perfil.Administrador ? "" : " and idusuario = ?") + " order by nome asc",
+				(idperfil === Perfil.Administrador ? [] : [idusuario])
+			)) || [];
 		});
 	}
 
@@ -58,9 +65,12 @@ class Predio {
 		}
 	}
 
-	public static obter(id: number): Promise<Predio | null> {
+	public static obter(id: number, idusuario: number, idperfil: Perfil): Promise<Predio | null> {
 		return app.sql.connect(async (sql) => {
-			const lista: Predio[] = await sql.query("select id, idusuario, nome, url, date_format(criacao, '%d/%m/%Y') criacao from predio where id = ? and exclusao is null", [id]);
+			const lista: Predio[] = await sql.query(
+				"select id, idusuario, nome, url, date_format(criacao, '%d/%m/%Y') criacao from predio where id = ? and exclusao is null" + (idperfil === Perfil.Administrador ? "" : " and idusuario = ?"),
+				(idperfil === Perfil.Administrador ? [id] : [id, idusuario])
+			);
 
 			if (!lista || !lista[0])
 				return null;
@@ -112,7 +122,7 @@ class Predio {
 		});
 	}
 
-	public static async editar(predio: Predio): Promise<string | null> {
+	public static async editar(predio: Predio, idusuario: number, idperfil: Perfil): Promise<string | null> {
 		const res = Predio.validar(predio, false);
 		if (res)
 			return res;
@@ -121,7 +131,10 @@ class Predio {
 			try {
 				await sql.beginTransaction();
 
-				await sql.query("update predio set nome = ?, url = ? where id = ? and exclusao is null", [predio.nome, predio.url, predio.id]);
+				await sql.query(
+					"update predio set nome = ?, url = ? where id = ? and exclusao is null" + (idperfil === Perfil.Administrador ? "" : " and idusuario = ?"),
+					(idperfil === Perfil.Administrador ? [predio.nome, predio.url, predio.id] : [predio.nome, predio.url, predio.id, idusuario])
+				);
 
 				if (!sql.affectedRows)
 					return "Tour não encontrado";
@@ -153,11 +166,14 @@ class Predio {
 		});
 	}
 
-	public static async excluir(id: number): Promise<string | null> {
+	public static async excluir(id: number, idusuario: number, idperfil: Perfil): Promise<string | null> {
 		return app.sql.connect(async (sql) => {
 			// Utilizar substr(url, instr(url, ':') + 1) para remover o prefixo, caso precise desfazer a exclusão (caso
 			// não exista o prefixo, instr() vai retornar 0, que, com o + 1, faz o substr() retornar a própria string inteira)
-			await sql.query("update predio set url = concat('@', id, ':', url), exclusao = ? where id = ? and exclusao is null", [DataUtil.horarioDeBrasiliaISOComHorario(), id]);
+			await sql.query(
+				"update predio set url = concat('@', id, ':', url), exclusao = ? where id = ? and exclusao is null" + (idperfil === Perfil.Administrador ? "" : " and idusuario = ?"),
+				(idperfil === Perfil.Administrador ? [DataUtil.horarioDeBrasiliaISOComHorario(), id] : [DataUtil.horarioDeBrasiliaISOComHorario(), id, idusuario])
+			);
 
 			return (sql.affectedRows ? null : "Tour não encontrado");
 		});
