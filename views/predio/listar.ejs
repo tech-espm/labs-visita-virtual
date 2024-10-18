@@ -9,7 +9,7 @@
 		order: [[1, "asc"]],
 		deferRender: true,
 		columns: [
-			{ title: "", "class": "col-min", searchable: false, orderable: false, data: "id", render: function (v, type, row) { return '<a target="_blank" title="Editar" href="<%- root %>/predio/editar?id=' + row.id + '" class="btn btn-sm btn-outline-primary"><i class="fa fa-fw fa-edit"></i></a> <a target="_blank" title="Visitar" href="<%- root %>/virtual/' + row.url + '/" class="btn btn-sm btn-outline-success"><i class="fa fa-fw fa-external-link-alt"></i></a> <a target="_blank" title="Visitar (Offline)" href="<%- root %>/app/' + row.url + '/" class="btn btn-sm btn-outline-info"><i class="fa fa-fw fa-download"></i></a> <button title="Excluir" type="button" data-excluir="1" class="btn btn-sm btn-outline-danger"><i class="fa fa-fw fa-times"></i></button>'; } },
+			{ title: "", "class": "col-min", searchable: false, orderable: false, data: "id", render: function (v, type, row) { return '<a target="_blank" title="Editar" href="<%- root %>/tour/editar?id=' + row.id + '" class="btn btn-sm btn-outline-primary"><i class="fa fa-fw fa-edit"></i></a> <a target="_blank" title="Visitar" href="<%- root %>/virtual/' + row.url + '/" class="btn btn-sm btn-outline-success"><i class="fa fa-fw fa-external-link-alt"></i></a> <a target="_blank" title="Visitar (Offline)" href="<%- root %>/app/' + row.url + '/" class="btn btn-sm btn-outline-info"><i class="fa fa-fw fa-download"></i></a> <button title="Excluir" type="button" data-excluir="1" class="btn btn-sm btn-outline-danger"><i class="fa fa-fw fa-times"></i></button>'; } },
 			{ title: "Nome", render: encode, data: "nome" },
 			{ title: "URL", render: encode, data: "url" },
 			{ title: "Usuário", render: encode, data: "usuario" },

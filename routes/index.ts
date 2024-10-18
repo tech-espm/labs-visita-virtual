@@ -10,7 +10,7 @@ class IndexRoute {
 		if (!u)
 			res.redirect(app.root + "/login");
 		else
-			res.redirect(app.root + "/predio/listar");
+			res.redirect(app.root + "/tour/listar");
 			//res.render("index/index", {
 			//	layout: "layout-sem-form",
 			//	titulo: "Dashboard",
