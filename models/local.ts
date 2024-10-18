@@ -49,7 +49,7 @@ class Local {
 
 	public static obter(id: number): Promise<Local | null> {
 		return app.sql.connect(async (sql) => {
-			const lista: Local[] = await sql.query("select l.id, l.nome, l.rgb, l.versao, l.nome_curto, l.idpredio, p.nome predio, l.idusuario, u.nome usuario, date_format(p.criacao, '%d/%m/%Y') criacao from local l inner join predio p on p.id = l.idpredio and p.exclusao is null inner join usuario u on u.id = l.idusuario where l.id = ? and l.exclusao is null", [id]);
+			const lista: Local[] = await sql.query("select l.id, l.nome, l.rgb, l.versao, l.nome_curto, l.idpredio, p.nome predio, p.url url, l.idusuario, u.nome usuario, date_format(p.criacao, '%d/%m/%Y') criacao from local l inner join predio p on p.id = l.idpredio and p.exclusao is null inner join usuario u on u.id = l.idusuario where l.id = ? and l.exclusao is null", [id]);
 
 			return ((lista && lista[0]) || null);
 		});

@@ -39,15 +39,26 @@
 	</div>
 </div>
 
-<div class="form-group mb-0">
+<div class="form-group <%- (item ? '' : 'mb-0') %>">
 	<label for="imagem">Imagem</label>
 	<input id="imagem" name="imagem" class="form-control" type="file" accept="image/jpeg" />
 </div>
+
+<% if (item) { %>
+<div class="form-group mb-0">
+	<label for="imagem-atual">Imagem Atual</label>
+	<div>
+		<img id="imagem-atual" style="width: 800px; max-width: 100%;" src="<%- root %>/app/<%- item.url %>/imagem/<%- item.id %>" />
+	</div>
+</div>
+<% } %>
 
 <%- contentFor("scripts") %>
 <script type="text/javascript">
 	//<![CDATA[
 	"use strict";
+
+	let vez = 0;
 
 	prepareCbSearch(document.getElementById("idpredio"));
 
@@ -81,10 +92,16 @@
 			//<% if (item) { %>
 
 			JsonWebApi.postFormData("<%- root %>/api/local/editar", new FormData(form), function (response) {
-				if (response.success)
+				if (response.success) {
+					if ($("#imagem").val()) {
+						vez++;
+						$("#imagem").val("");
+						$("#imagem-atual").attr("src", "<%- root %>/app/<%- item.url %>/imagem/<%- item.id %>?" + vez);
+					}
 					Swal.success("Local alterado com sucesso! " + emoji.happy);
-				else
+				} else {
 					Swal.error(response.value + " " + emoji.sad);
+				}
 			});
 
 			//<% } else { %>
