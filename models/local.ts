@@ -27,6 +27,8 @@ class Local {
 				return "Id inválido";
 		}
 
+		local.idusuario = parseInt(local.idusuario as any) || 0;
+
 		if (!(local.idpredio = parseInt(local.idpredio as any)))
 			return "Tour inválido";
 
@@ -83,7 +85,7 @@ class Local {
 				)))
 					return "Tour não encontrado";
 
-				await sql.query("insert into local (idpredio, idusuario, nome, rgb, nome_curto, versao, criacao) values (?, ?, ?, ?, ?, ?, ?)", [local.idpredio, idusuario, local.nome, local.rgb, local.nome_curto, 1, DataUtil.horarioDeBrasiliaISOComHorario()]);
+				await sql.query("insert into local (idpredio, idusuario, nome, rgb, nome_curto, versao, criacao) values (?, ?, ?, ?, ?, ?, ?)", [local.idpredio, (idperfil === Perfil.Administrador) ? local.idusuario : idusuario, local.nome, local.rgb, local.nome_curto, 1, DataUtil.horarioDeBrasiliaISOComHorario()]);
 
 				local.id = await sql.scalar("select last_insert_id()");
 
@@ -158,6 +160,9 @@ class Local {
 
 				if (!sql.affectedRows)
 					return "Local não encontrado";
+
+				if (idperfil === Perfil.Administrador)
+					await sql.query(`update local set idusuario = ? where id = ?`, [local.idusuario, local.id]);
 
 				if (imagem)
 					await app.fileSystem.saveUploadedFile(`public/img/${appsettings.pastaLocais}/${local.id}.jpg`, imagem);

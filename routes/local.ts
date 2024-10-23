@@ -16,6 +16,7 @@ class LocalRoute {
         usuario: u,
         item: null,
         predios: await Predio.listarCombo(u.id, u.idperfil),
+        usuarios: (u.admin ? await Usuario.listarCombo() : null),
       });
   }
 
@@ -38,6 +39,7 @@ class LocalRoute {
           usuario: u,
           item: item,
           predios: await Predio.listarCombo(u.id, u.idperfil),
+          usuarios: (u.admin ? await Usuario.listarCombo() : null),
         });
     }
   }

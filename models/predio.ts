@@ -27,6 +27,8 @@ class Predio {
 				return "Id inválido";
 		}
 
+		predio.idusuario = parseInt(predio.idusuario as any) || 0;
+
 		if (!predio.nome || !(predio.nome = predio.nome.normalize().trim()) || predio.nome.length > 50)
 			return "Nome inválido";
 
@@ -98,14 +100,14 @@ class Predio {
 		});
 	}
 
-	public static async criar(predio: Predio, idusuario: number): Promise<string | null> {
+	public static async criar(predio: Predio, idusuario: number, idperfil: Perfil): Promise<string | null> {
 		const res = Predio.validar(predio, true);
 		if (res)
 			return res;
 
 		return app.sql.connect(async (sql) => {
 			try {
-				await sql.query("insert into predio (idusuario, nome, url, criacao) values (?, ?, ?, ?)", [idusuario, predio.nome, predio.url, DataUtil.horarioDeBrasiliaISOComHorario()]);
+				await sql.query("insert into predio (idusuario, nome, url, criacao) values (?, ?, ?, ?)", [(idperfil === Perfil.Administrador) ? predio.idusuario : idusuario, predio.nome, predio.url, DataUtil.horarioDeBrasiliaISOComHorario()]);
 
 				return null;
 			} catch (ex: any) {
@@ -138,6 +140,9 @@ class Predio {
 
 				if (!sql.affectedRows)
 					return "Tour não encontrado";
+
+				if (idperfil === Perfil.Administrador)
+					await sql.query(`update predio set idusuario = ? where id = ?`, [predio.idusuario, predio.id]);
 
 				if (predio.locais) {
 					if (!Array.isArray(predio.locais))

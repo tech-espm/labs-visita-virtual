@@ -39,6 +39,19 @@
 	</div>
 </div>
 
+<% if (usuario.admin) { %>
+<div class="form-group">
+	<label for="idusuario">Usuário</label>
+	<div class="cb-search">
+		<select id="idusuario" name="idusuario" class="form-control">
+			<% for (let i = 0; i < usuarios.length; i++) { %>
+			<option value="<%- usuarios[i].id %>" <%- (((item && item.idusuario === usuarios[i].id) || (!item && usuario.id === usuarios[i].id)) ? 'selected="selected"' : '') %>><%= usuarios[i].nome %></option>
+			<% } %>
+		</select>
+	</div>
+</div>
+<% } %>
+
 <div class="form-group <%- (item ? '' : 'mb-0') %>">
 	<label for="imagem">Imagem</label>
 	<input id="imagem" name="imagem" class="form-control" type="file" accept="image/jpeg" />
@@ -61,6 +74,10 @@
 	let vez = 0;
 
 	prepareCbSearch(document.getElementById("idpredio"));
+
+	//<% if (usuario.admin) { %>
+	prepareCbSearch(document.getElementById("idusuario"));
+	//<% } %>
 
 	$("#form").validate({
 		rules: {
@@ -109,6 +126,9 @@
 			JsonWebApi.postFormData("<%- root %>/api/local/criar", new FormData(form), function (response) {
 				if (response.success) {
 					resetForm("#form");
+					//<% if (usuario.admin) { %>
+					setCbSearch(document.getElementById("idusuario"), "<%- usuario.id %>");
+					//<% } %>
 					Swal.success("Local criado com sucesso! " + emoji.happy);
 				} else {
 					Swal.error(response.value + " " + emoji.sad);

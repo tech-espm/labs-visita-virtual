@@ -14,6 +14,7 @@ class PredioRoute {
         textoSubmit: "Criar",
         usuario: u,
         item: null,
+        usuarios: (u.admin ? await Usuario.listarCombo() : null),
       });
   }
 
@@ -35,6 +36,7 @@ class PredioRoute {
           titulo: "Editar Tour",
           usuario: u,
           item: item,
+          usuarios: (u.admin ? await Usuario.listarCombo() : null),
         });
     }
   }

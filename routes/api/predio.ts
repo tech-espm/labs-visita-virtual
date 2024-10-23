@@ -9,7 +9,7 @@ class PredioRoute {
 		if (!u)
 			return;
 
-		const erro = await Predio.criar(req.body, u.id);
+		const erro = await Predio.criar(req.body, u.id, u.idperfil);
 
 		if (erro) {
 			res.status(400).json(erro);
