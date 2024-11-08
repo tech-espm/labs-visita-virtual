@@ -1,4 +1,5 @@
 import app = require("teem");
+import Local = require("../models/local");
 import Predio = require("../models/predio");
 import Usuario = require("../models/usuario");
 
@@ -15,6 +16,7 @@ class PredioRoute {
         usuario: u,
         item: null,
         usuarios: (u.admin ? await Usuario.listarCombo() : null),
+        locais: await Local.listarCombo(),
       });
   }
 
@@ -37,6 +39,7 @@ class PredioRoute {
           usuario: u,
           item: item,
           usuarios: (u.admin ? await Usuario.listarCombo() : null),
+          locais: await Local.listarCombo(),
         });
     }
   }
@@ -53,7 +56,7 @@ class PredioRoute {
         datatables: true,
         xlsx: true,
         usuario: u,
-        lista: await Predio.listar(u.id, u.idperfil),
+        lista: await Predio.listar(),
       });
   }
 }

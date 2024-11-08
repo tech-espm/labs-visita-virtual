@@ -5,11 +5,12 @@ import Perfil = require("../enums/perfil");
 
 interface Local {
 	id: number;
-	idpredio: number;
 	idusuario: number;
 	nome: string;
+	nome_en: string;
 	rgb: string;
 	nome_curto: string;
+	nome_curto_en: string;
 	versao: number;
 	criacao: string;
 	exclusao: string | null;
@@ -29,35 +30,41 @@ class Local {
 
 		local.idusuario = parseInt(local.idusuario as any) || 0;
 
-		if (!(local.idpredio = parseInt(local.idpredio as any)))
-			return "Tour inválido";
-
 		if (!local.nome || !(local.nome = local.nome.normalize().trim()) || local.nome.length > 50)
 			return "Nome inválido";
+
+		if (!local.nome_en || !(local.nome_en = local.nome_en.normalize().trim()) || local.nome_en.length > 50)
+			return "Nome em Inglês inválido";
 
 		if (!local.rgb || !(local.rgb = local.rgb.normalize().trim()) || local.rgb.length > 10)
 			return "Cor inválida";
 
-		if (!local.nome_curto || !(local.nome_curto = local.nome_curto.normalize().trim()) || local.nome.length > 50)
-			return "Nome inválido";
+		if (!local.nome_curto || !(local.nome_curto = local.nome_curto.normalize().trim()) || local.nome_curto.length > 50)
+			return "Nome curto inválido";
+
+		if (!local.nome_curto_en || !(local.nome_curto_en = local.nome_curto_en.normalize().trim()) || local.nome_curto_en.length > 50)
+			return "Nome curto em Inglês inválido";
 
 		return null;
 	}
 
-	public static listar(idusuario: number, idperfil: Perfil): Promise<Local[]> {
+	public static listar(): Promise<Local[]> {
 		return app.sql.connect(async (sql) => {
-			return (await sql.query(
-				"select l.id, l.nome, l.rgb, l.versao, l.nome_curto, l.idpredio, p.nome predio, p.url, l.idusuario, u.nome usuario, date_format(p.criacao, '%d/%m/%Y') criacao from local l inner join predio p on p.id = l.idpredio and p.exclusao is null " + (idperfil === Perfil.Administrador ? "" : " and p.idusuario = ?") + " inner join usuario u on u.id = l.idusuario where l.exclusao is null",
-				(idperfil === Perfil.Administrador ? [] : [idusuario])
-			)) || [];
+			return (await sql.query("select l.id, l.nome, l.nome_en, l.rgb, l.versao, l.nome_curto, l.nome_curto_en, l.idusuario, u.nome usuario, date_format(l.criacao, '%d/%m/%Y') criacao from local l inner join usuario u on u.id = l.idusuario where l.exclusao is null")) || [];
+		});
+	}
+
+	public static listarCombo(): Promise<Local[]> {
+		return app.sql.connect(async (sql) => {
+			return (await sql.query("select id, nome, rgb from local where exclusao is null order by nome asc")) || [];
 		});
 	}
 
 	public static obter(id: number, idusuario: number, idperfil: Perfil): Promise<Local | null> {
 		return app.sql.connect(async (sql) => {
 			const lista: Local[] = await sql.query(
-				"select l.id, l.nome, l.rgb, l.versao, l.nome_curto, l.idpredio, p.nome predio, p.url url, l.idusuario, u.nome usuario, date_format(p.criacao, '%d/%m/%Y') criacao from local l inner join predio p on p.id = l.idpredio and p.exclusao is null " + (idperfil === Perfil.Administrador ? "" : " and p.idusuario = ?") + " inner join usuario u on u.id = l.idusuario where l.id = ? and l.exclusao is null",
-				(idperfil === Perfil.Administrador ? [id] : [idusuario, id])
+				"select l.id, l.nome, l.nome_en, l.rgb, l.versao, l.nome_curto, l.nome_curto_en, l.idusuario, u.nome usuario, date_format(l.criacao, '%d/%m/%Y') criacao from local l inner join usuario u on u.id = l.idusuario where l.id = ? and l.exclusao is null" + ((idperfil === Perfil.Administrador) ? "" : " and l.idusuario = ?"),
+				(idperfil === Perfil.Administrador ? [id] : [id, idusuario])
 			);
 
 			return ((lista && lista[0]) || null);
@@ -79,13 +86,7 @@ class Local {
 			try {
 				await sql.beginTransaction();
 
-				if (!(await sql.scalar(
-					"select id from predio where id = ? and exclusao is null" + (idperfil === Perfil.Administrador ? "" : " and idusuario = ?"),
-					(idperfil === Perfil.Administrador ? [local.idpredio] : [local.idpredio, idusuario])
-				)))
-					return "Tour não encontrado";
-
-				await sql.query("insert into local (idpredio, idusuario, nome, rgb, nome_curto, versao, criacao) values (?, ?, ?, ?, ?, ?, ?)", [local.idpredio, (idperfil === Perfil.Administrador) ? local.idusuario : idusuario, local.nome, local.rgb, local.nome_curto, 1, DataUtil.horarioDeBrasiliaISOComHorario()]);
+				await sql.query("insert into local (idusuario, nome, nome_en, rgb, nome_curto, nome_curto_en, versao, criacao) values (?, ?, ?, ?, ?, ?, ?, ?)", [(idperfil === Perfil.Administrador) ? local.idusuario : idusuario, local.nome, local.nome_en, local.rgb, local.nome_curto, local.nome_curto_en, 1, DataUtil.horarioDeBrasiliaISOComHorario()]);
 
 				local.id = await sql.scalar("select last_insert_id()");
 
@@ -123,40 +124,21 @@ class Local {
 			try {
 				await sql.beginTransaction();
 
-				if (!(await sql.scalar(
-					"select id from predio where id = ? and exclusao is null" + (idperfil === Perfil.Administrador ? "" : " and idusuario = ?"),
-					(idperfil === Perfil.Administrador ? [local.idpredio] : [local.idpredio, idusuario])
-				)))
-					return "Tour não encontrado";
+				const dadosAntigos: Local[] = await sql.query("select nome, nome_en, rgb, nome_curto, nome_curto_en from local where id = ? and exclusao is null" + ((idperfil === Perfil.Administrador) ? "" : " and idusuario = ?"), (idperfil === Perfil.Administrador) ? [local.id] : [local.id, idusuario]);
 
-				let alterarVersao = !!imagem;
+				if (!dadosAntigos || !dadosAntigos[0])
+					return "Local não encontrado";
 
-				if (!alterarVersao) {
-					const dadosAntigos: Local[] = await sql.query("select idpredio, nome, rgb, nome_curto from local where id = ? and exclusao is null", [local.id]);
+				const alterarVersao = (
+					!!imagem ||
+					dadosAntigos[0].nome !== local.nome ||
+					dadosAntigos[0].nome_en !== local.nome_en ||
+					dadosAntigos[0].rgb !== local.rgb ||
+					dadosAntigos[0].nome_curto !== local.nome_curto ||
+					dadosAntigos[0].nome_curto_en !== local.nome_curto_en
+				);
 
-					if (!dadosAntigos || !dadosAntigos[0])
-						return "Local não encontrado";
-
-					// Não precisa validar para administradores, nem precisa considerar a questão
-					// de prédios excluídos (só faz essa consulta para evitar edições de locais
-					// que não pertençam a um tour do usuário)
-					if (idperfil !== Perfil.Administrador && dadosAntigos[0].idpredio !== local.idpredio) {
-						if (!(await sql.scalar(
-							"select id from predio where id = ? and idusuario = ?",
-							[dadosAntigos[0].idpredio, idusuario]
-						)))
-							return "Local não encontrado";
-					}
-
-					alterarVersao = (
-						dadosAntigos[0].idpredio !== local.idpredio ||
-						dadosAntigos[0].nome !== local.nome ||
-						dadosAntigos[0].rgb !== local.rgb ||
-						dadosAntigos[0].nome_curto !== local.nome_curto
-					);
-				}
-
-				await sql.query(`update local set idpredio = ?, nome = ?, rgb = ?, nome_curto = ?${(alterarVersao ? ", versao = versao + 1" : "")} where id = ? and exclusao is null`, [local.idpredio, local.nome, local.rgb, local.nome_curto, local.id]);
+				await sql.query(`update local set nome = ?, nome_en = ?, rgb = ?, nome_curto = ?, nome_curto_en = ?${(alterarVersao ? ", versao = versao + 1" : "")} where id = ? and exclusao is null`, [local.nome, local.nome_en, local.rgb, local.nome_curto, local.nome_curto_en, local.id]);
 
 				if (!sql.affectedRows)
 					return "Local não encontrado";
@@ -186,22 +168,12 @@ class Local {
 		return app.sql.connect(async (sql) => {
 			await sql.beginTransaction();
 
-			if (idperfil !== Perfil.Administrador) {
-				const idpredio: number = await sql.scalar("select idpredio from local where id = ? and exclusao is null", [id]);
-				if (!idpredio)
-					return "Local não encontrado";
-
-				if (!(await sql.scalar(
-					"select id from predio where id = ? and idusuario = ?",
-					[idpredio, idusuario]
-				)))
-					return "Local não encontrado";
-			}
-
-			await sql.query("update local set exclusao = ? where id = ? and exclusao is null", [DataUtil.horarioDeBrasiliaISOComHorario(), id]);
+			await sql.query("update local set exclusao = ? where id = ? and exclusao is null" + ((idperfil === Perfil.Administrador) ? "" : " and idusuario = ?"), (idperfil === Perfil.Administrador) ? [DataUtil.horarioDeBrasiliaISOComHorario(), id] : [DataUtil.horarioDeBrasiliaISOComHorario(), id, idusuario]);
 
 			if (!sql.affectedRows) 
 				return "Local não encontrado";
+
+			await sql.query("delete from predio_local where idlocal = ?", [id]);
 
 			await app.fileSystem.deleteFile(`public/img/${appsettings.pastaLocais}/${id}.jpg`);
 

@@ -73,9 +73,9 @@ class IndexRoute {
 		const url = req.params["url"];
 		let predio: Predio | null;
 		if (!url || !(predio = await Predio.obterPorUrl(url))) {
-			res.render("index/erro", { layout: "layout-externo", mensagem: "Não foi possível encontrar essa visita", erro: "Não foi possível encontrar essa visita" });
+			res.render("index/erro", { layout: "layout-externo", mensagem: "Não foi possível encontrar esse tour", erro: "Não foi possível encontrar esse tour" });
 		} else if (!predio.locais || !predio.locais.length) {
-			res.render("index/erro", { layout: "layout-externo", mensagem: "Não há locais cadastrados para essa visita", erro: "Não há locais cadastrados para essa visita" });
+			res.render("index/erro", { layout: "layout-externo", mensagem: "Não há locais cadastrados para esse tour", erro: "Não há locais cadastrados para esse tour" });
 		} else {
 			if (manifest_webmanifest)
 				res.contentType("application/manifest+json");

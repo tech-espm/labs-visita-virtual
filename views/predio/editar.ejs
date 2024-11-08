@@ -1,14 +1,21 @@
 ﻿<input type="hidden" id="id" name="id" value="<%=(item ? item.id : 0) %>" />
 
 <div class="row">
-	<div class="col-sm-6">
-		<div class="form-group mb-sm-0">
+	<div class="col-md-4">
+		<div class="form-group mb-md-0">
 			<label for="nome">Nome</label>
 			<input id="nome" name="nome" maxlength="50" class="form-control" type="text" spellcheck="false" value="<%=(item ? item.nome : '') %>" />
 		</div>
 	</div>
 
-	<div class="col-sm-6">
+	<div class="col-md-4">
+		<div class="form-group mb-md-0">
+			<label for="nome_en">Nome em Inglês</label>
+			<input id="nome_en" name="nome_en" maxlength="50" class="form-control" type="text" spellcheck="false" value="<%=(item ? item.nome_en : '') %>" />
+		</div>
+	</div>
+
+	<div class="col-md-4">
 		<div class="form-group mb-0">
 			<label for="url">URL</label>
 			<input id="url" name="url" maxlength="60" class="form-control" type="text" spellcheck="false" value="<%=(item ? item.url : '') %>" />
@@ -29,19 +36,43 @@
 </div>
 <% } %>
 
-<% if (item && item.locais && item.locais.length) { %>
+<hr class="my-5" />
+
+<h2 class="my-4">Locais</h2>
+
+<div class="row">
+	<div class="col-sm-8 mb-3">
+		<div class="cb-search">
+			<select id="idlocal" name="idlocal" class="form-control" size="1">
+				<option value="">Selecione...</option>
+				<% for (let i = 0; i < locais.length; i++) { %>
+				<option data-rgb="<%= locais[i].rgb %>" value="<%= locais[i].id %>"><%= locais[i].nome %></option>
+				<% } %>
+			</select>
+		</div>
+	</div>
+
+	<div class="col-sm-4 mb-3">
+		<button type="button" onclick="adicionarLocal()" class="btn btn-primary btn-block"><i class="fa fa-plus"></i> Adicionar</button>
+	</div>
+</div>
+
 <div class="table-responsive">
 	<table class="table table-striped table-hover ui-sortable mt-3 mb-0">
 		<thead>
 			<tr>
+				<th class="col-min"></th>
 				<th class="col-min">Ordem</th>
 				<th class="col-min">Cor</th>
 				<th>Local</th>
 			</tr>
 		</thead>
 		<tbody id="tbodyLocais" class="secao-locais">
-			<% for (let i = 0; i < item.locais.length; i++) { %>
+			<% if (item && item.locais) { for (let i = 0; i < item.locais.length; i++) { %>
 			<tr class="ui-sortable-handle">
+				<td class="col-min">
+					<button title="Excluir" type="button" onclick="removerLocal(this)" class="btn btn-sm btn-outline-danger"><i class="fa fa-fw fa-times"></i></button>
+				</td>
 				<td class="col-min text-center local-enum"></td>
 				<td class="col-min text-center">
 					<span style="background-color: <%- item.locais[i].rgb %>; display: inline-block; width: 1rem; height: 1rem; border-radius: 1rem; vertical-align: middle;"></span>
@@ -51,11 +82,10 @@
 					<%= item.locais[i].nome %>
 				</td>
 			</tr>
-			<% } %>
+			<% } } %>
 		</tbody>
 	</table>
 </div>
-<% } %>
 
 <%- contentFor("styles") %>
 <link rel="stylesheet" type="text/css" href="<%- staticRoot %>/lib/jquery-ui-1.13.2/jquery-ui.min.css" />
@@ -86,6 +116,39 @@
 	prepareCbSearch(document.getElementById("idusuario"));
 	//<% } %>
 
+	prepareCbSearch(document.getElementById("idlocal"));
+
+	function adicionarLocal() {
+		if (JsonWebApi.active)
+			return;
+
+		const id = parseInt($("#idlocal").val());
+
+		if (!id)
+			return;
+
+		$("#tbodyLocais").append(`<tr class="ui-sortable-handle">
+			<td class="col-min">
+				<button title="Excluir" type="button" onclick="removerLocal(this)" class="btn btn-sm btn-outline-danger"><i class="fa fa-fw fa-times"></i></button>
+			</td>
+			<td class="col-min text-center local-enum"></td>
+			<td class="col-min text-center">
+				<span style="background-color: ${$("#idlocal option:selected").attr("data-rgb")}; display: inline-block; width: 1rem; height: 1rem; border-radius: 1rem; vertical-align: middle;"></span>
+			</td>
+			<td>
+				<input type="hidden" name="locais" value="${id}" />
+				${$("#idlocal option:selected").html()}
+			</td>
+		</tr>`);
+	}
+
+	function removerLocal(btn) {
+		if (JsonWebApi.active)
+			return;
+
+		$(btn.parentNode.parentNode).remove();
+	}
+
 	$("#tbodyLocais").sortable().disableSelection();
 
 	$("#url").mask("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ", { translation: {
@@ -98,6 +161,9 @@
 	$("#form").validate({
 		rules: {
 			nome: {
+				required: true
+			},
+			nome_en: {
 				required: true
 			},
 			url: {
@@ -125,6 +191,7 @@
 			JsonWebApi.postFormData("<%- root %>/api/predio/criar", form, function (response) {
 				if (response.success) {
 					resetForm("#form");
+					$("#tbodyLocais").empty();
 					//<% if (usuario.admin) { %>
 					setCbSearch(document.getElementById("idusuario"), "<%- usuario.id %>");
 					//<% } %>

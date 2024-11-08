@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
 	<%- include("../favicon") %>
 	<link rel="manifest" href="<%- root %>/app/<%- predio.url %>/manifest.webmanifest" />
@@ -120,6 +120,27 @@
 		let botaoLocaisXR = null;
 		const rgbPadrao = "#a80532";
 
+		let idioma = "en";
+		let sufixoIdioma = "_en";
+		let strings = {
+			"Locais": "Locals",
+			"Modo WebXR": "WebXR Mode",
+			"Visita Virtual ESPM": "ESPM Virtual Visit",
+		};
+
+		function traduzir(texto) {
+			return (strings && strings[texto]) || texto;
+		}
+
+		function obterNomeCurto(obj) {
+			let nome_curto = null;
+
+			if (sufixoIdioma)
+				nome_curto = (obj["nome_curto" + sufixoIdioma] || obj["nome" + sufixoIdioma]);
+
+			return nome_curto || obj.nome_curto || obj.nome;
+		}
+
 		function relativeLuminance(rgb) {
 			if ((typeof rgb) === "string")
 				rgb = parseInt(rgb.replace("#", ""), 16);
@@ -200,7 +221,7 @@
 		}
 
 		function criarBotaoImagem(indice) {
-			return criarBotao("botaoImagem" + indice, imagens[indice].nome_curto || imagens[indice].nome, imagens[indice].rgb, function () {
+			return criarBotao("botaoImagem" + indice, obterNomeCurto(imagens[indice]), imagens[indice].rgb, function () {
 				imagemAtual = indice;
 				if (!modoXR)
 					alternarMenu();
@@ -242,7 +263,7 @@
 			menu.position.z = -2; // Move a esfera um pouco para a direita
 			menu.position.x = -4; // Move a esfera um pouco para trás
 			menu.blockLayout = true;
-			botaoLocaisXR = criarBotao("locais", "Locais", null, alternarMenu);
+			botaoLocaisXR = criarBotao("locais", traduzir("Locais"), null, alternarMenu);
 			for (let i = 0; i < imagens.length; i++) {
 				const botao = criarBotaoImagem(i);
 				botao.isVisible = visibilidadeBotoesImagem;
@@ -311,7 +332,7 @@
 					}
 				}
 
-				const botao = criarBotao("botaoWebXR", "Modo WebXR", null, function () {
+				const botao = criarBotao("botaoWebXR", traduzir("Modo WebXR"), null, function () {
 					window.location.href += "?webxr";
 				});
 				botao.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
@@ -356,14 +377,14 @@
 			};
 
 			const criarBotaoImagemHTML = function (pai, indice) {
-				return criarBotaoHTML(pai, imagens[indice].nome_curto || imagens[indice].nome, imagens[indice].rgb, function () {
+				return criarBotaoHTML(pai, obterNomeCurto(imagens[indice]), imagens[indice].rgb, function () {
 					imagemAtual = indice;
 					//alternarMenuHTML();
 					criarDomo(false);
 				});
 			};
 
-			const botaoLocais = criarBotaoHTML(document.body, "Locais", rgbPadrao, alternarMenuHTML);
+			const botaoLocais = criarBotaoHTML(document.body, traduzir("Locais"), rgbPadrao, alternarMenuHTML);
 			botaoLocais.style.position = "fixed";
 			botaoLocais.style.zIndex = "3";
 			botaoLocais.style.left = "0.5rem";
@@ -374,7 +395,7 @@
 
 			divMenu.appendChild(divBotoes);
 
-			const botaoXR = criarBotaoHTML(divMenu, "Modo WebXR", null, function () {
+			const botaoXR = criarBotaoHTML(divMenu, traduzir("Modo WebXR"), null, function () {
 				window.location.href += "?webxr";
 			});
 
@@ -408,7 +429,7 @@
 				/*
 				ui = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
-				const botao = criarBotao("locais", "Locais", null, alternarMenu);
+				const botao = criarBotao("locais", traduzir("Locais"), null, alternarMenu);
 				botao.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
 				botao.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
 				ui.addControl(botao);
@@ -422,6 +443,15 @@
 		});
 
 		async function setup() {
+			const language = (navigator["userLanguage"] || navigator.language);
+			if (language && language.toLowerCase().indexOf("pt") === 0) {
+				idioma = "pt-br";
+				sufixoIdioma = "";
+				strings = null;
+				document.documentElement.setAttribute("lang", "pt-br");
+			}
+			document.title = obterNomeCurto(predio) + " - " + traduzir("Visita Virtual ESPM");
+
 			engine = new BABYLON.Engine(canvas, true, {
 				preserveDrawingBuffer: false,
 				stencil: false,

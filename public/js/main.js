@@ -1048,7 +1048,7 @@ window.capitalizarFrase = function (s, classe, tag) {
 				}
 			} catch (ex) {
 				if (ex.name === "SyntaxError")
-					return { xhr: xhr, success: false, status: -1, value: xhr.responseText, exceptionType: "SyntaxError" };
+					return { xhr: xhr, success: false, status: -1, value: xhr.responseText || "Nenhuma resposta recebida do servidor. Por favor, verifique a conexão e tente novamente mais tarde.", exceptionType: "SyntaxError" };
 				return buildException(xhr, ex);
 			}
 		},

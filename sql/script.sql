@@ -46,19 +46,29 @@ CREATE TABLE predio (
 
 CREATE TABLE local (
   id int NOT NULL AUTO_INCREMENT,
-  idpredio int NOT NULL,
   idusuario int NOT NULL,
   nome VARCHAR(50) NOT NULL,
+  nome_en VARCHAR(50) NOT NULL,
   rgb VARCHAR(10) NOT NULL,
   nome_curto VARCHAR(50) NOT NULL,
-  ordem INT NOT NULL DEFAULT 0,
+  nome_curto_en VARCHAR(50) NOT NULL,
   versao INT NOT NULL,
   criacao datetime NOT NULL,
   exclusao datetime NULL,
   PRIMARY KEY (id),
   KEY local_exclusao_IX (exclusao),
-  KEY local_idpredio_exclusao_FK_IX (idpredio, exclusao),
   KEY local_idusuario_exclusao_FK_IX (idusuario, exclusao),
-  CONSTRAINT local_idpredio_FK FOREIGN KEY (idpredio) REFERENCES predio (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT local_idusuario_FK FOREIGN KEY (idusuario) REFERENCES usuario (id) ON DELETE RESTRICT ON UPDATE RESTRICT
+);
+
+CREATE TABLE predio_local (
+  id int NOT NULL AUTO_INCREMENT,
+  idpredio int NOT NULL,
+  idlocal int NOT NULL,
+  ordem int NOT NULL,
+  PRIMARY KEY (id),
+  KEY predio_local_idpredio_ordem_FK_IX (idpredio, ordem),
+  KEY predio_local_idlocal_FK_IX (idlocal),
+  CONSTRAINT predio_local_idpredio_FK FOREIGN KEY (idpredio) REFERENCES predio (id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT predio_local_idlocal_FK FOREIGN KEY (idlocal) REFERENCES local (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
