@@ -37,6 +37,7 @@ CREATE TABLE predio (
   url VARCHAR(75) NOT NULL,
   criacao datetime NOT NULL,
   exclusao datetime NULL,
+  nome_en VARCHAR(50) NULL,
   PRIMARY KEY (id),
   UNIQUE KEY predio_url_UN (url),
   KEY predio_exclusao_IX (exclusao),
