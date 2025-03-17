@@ -14,6 +14,8 @@ interface Local {
 	versao: number;
 	criacao: string;
 	exclusao: string | null;
+	descricao: string;
+	descricao_en: string;
 }
 
 class Local {
@@ -36,6 +38,9 @@ class Local {
 		if (!local.nome_en || !(local.nome_en = local.nome_en.normalize().trim()) || local.nome_en.length > 50)
 			return "Nome em Inglês inválido";
 
+		if (!local.descricao || !(local.descricao = local.descricao.normalize().trim()) || local.descricao.length > 500)
+			return "Descrição inválida";
+
 		if (!local.rgb || !(local.rgb = local.rgb.normalize().trim()) || local.rgb.length > 10)
 			return "Cor inválida";
 
@@ -44,6 +49,9 @@ class Local {
 
 		if (!local.nome_curto_en || !(local.nome_curto_en = local.nome_curto_en.normalize().trim()) || local.nome_curto_en.length > 50)
 			return "Nome curto em Inglês inválido";
+
+		if (!local.descricao_en || !(local.descricao_en = local.descricao_en.normalize().trim()) || local.descricao_en.length > 500)
+			return "Descrição em Inglês inválida";
 
 		return null;
 	}
@@ -63,7 +71,7 @@ class Local {
 	public static obter(id: number, idusuario: number, idperfil: Perfil): Promise<Local | null> {
 		return app.sql.connect(async (sql) => {
 			const lista: Local[] = await sql.query(
-				"select l.id, l.nome, l.nome_en, l.rgb, l.versao, l.nome_curto, l.nome_curto_en, l.idusuario, u.nome usuario, date_format(l.criacao, '%d/%m/%Y') criacao from local l inner join usuario u on u.id = l.idusuario where l.id = ? and l.exclusao is null" + ((idperfil === Perfil.Administrador) ? "" : " and l.idusuario = ?"),
+				"select l.id, l.nome, l.nome_en, l.rgb, l.versao, l.nome_curto, l.nome_curto_en, l.descricao, l.descricao_en, l.idusuario, u.nome usuario, date_format(l.criacao, '%d/%m/%Y') criacao from local l inner join usuario u on u.id = l.idusuario where l.id = ? and l.exclusao is null" + ((idperfil === Perfil.Administrador) ? "" : " and l.idusuario = ?"),
 				(idperfil === Perfil.Administrador ? [id] : [id, idusuario])
 			);
 
@@ -86,7 +94,7 @@ class Local {
 			try {
 				await sql.beginTransaction();
 
-				await sql.query("insert into local (idusuario, nome, nome_en, rgb, nome_curto, nome_curto_en, versao, criacao) values (?, ?, ?, ?, ?, ?, ?, ?)", [(idperfil === Perfil.Administrador) ? local.idusuario : idusuario, local.nome, local.nome_en, local.rgb, local.nome_curto, local.nome_curto_en, 1, DataUtil.horarioDeBrasiliaISOComHorario()]);
+				await sql.query("insert into local (idusuario, nome, nome_en, rgb, nome_curto, nome_curto_en, descricao, descricao_en, versao, criacao) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [(idperfil === Perfil.Administrador) ? local.idusuario : idusuario, local.nome, local.nome_en, local.rgb, local.nome_curto, local.nome_curto_en, local.descricao, local.descricao_en, 1, DataUtil.horarioDeBrasiliaISOComHorario()]);
 
 				local.id = await sql.scalar("select last_insert_id()");
 
@@ -124,7 +132,7 @@ class Local {
 			try {
 				await sql.beginTransaction();
 
-				const dadosAntigos: Local[] = await sql.query("select nome, nome_en, rgb, nome_curto, nome_curto_en from local where id = ? and exclusao is null" + ((idperfil === Perfil.Administrador) ? "" : " and idusuario = ?"), (idperfil === Perfil.Administrador) ? [local.id] : [local.id, idusuario]);
+				const dadosAntigos: Local[] = await sql.query("select nome, nome_en, rgb, nome_curto, nome_curto_en, descricao, descricao_en from local where id = ? and exclusao is null" + ((idperfil === Perfil.Administrador) ? "" : " and idusuario = ?"), (idperfil === Perfil.Administrador) ? [local.id] : [local.id, idusuario]);
 
 				if (!dadosAntigos || !dadosAntigos[0])
 					return "Local não encontrado";
@@ -135,10 +143,12 @@ class Local {
 					dadosAntigos[0].nome_en !== local.nome_en ||
 					dadosAntigos[0].rgb !== local.rgb ||
 					dadosAntigos[0].nome_curto !== local.nome_curto ||
-					dadosAntigos[0].nome_curto_en !== local.nome_curto_en
+					dadosAntigos[0].nome_curto_en !== local.nome_curto_en ||
+					dadosAntigos[0].descricao !== local.descricao ||
+					dadosAntigos[0].descricao_en !== local.descricao_en
 				);
 
-				await sql.query(`update local set nome = ?, nome_en = ?, rgb = ?, nome_curto = ?, nome_curto_en = ?${(alterarVersao ? ", versao = versao + 1" : "")} where id = ? and exclusao is null`, [local.nome, local.nome_en, local.rgb, local.nome_curto, local.nome_curto_en, local.id]);
+				await sql.query(`update local set nome = ?, nome_en = ?, rgb = ?, nome_curto = ?, nome_curto_en = ?, descricao = ?, descricao_en = ?${(alterarVersao ? ", versao = versao + 1" : "")} where id = ? and exclusao is null`, [local.nome, local.nome_en, local.rgb, local.nome_curto, local.nome_curto_en, local.descricao, local.descricao_en, local.id]);
 
 				if (!sql.affectedRows)
 					return "Local não encontrado";
