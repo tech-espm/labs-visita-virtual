@@ -16,6 +16,13 @@
 	</div>
 </div>
 
+<div>
+	<div class="form-group">
+		<label for="descricao">Descrição</label>
+		<textarea id="descricao" name="descricao" maxlength="500" class="form-control" rows="5" value="<%=(item ? item.descricao : '') %>" ></textarea>
+	</div>
+</div>
+
 <div class="row">
 	<div class="col-sm-6">
 		<div class="form-group">
@@ -29,6 +36,13 @@
 			<label for="nome_curto_en">Nome Curto em Inglês</label>
 			<input id="nome_curto_en" name="nome_curto_en" maxlength="50" class="form-control" type="text" spellcheck="false" value="<%=(item ? item.nome_curto_en : '') %>" />
 		</div>
+	</div>
+</div>
+
+<div>
+	<div class="form-group">
+		<label for="descricao_en">Descrição em Inglês</label>
+		<textarea id="descricao_en" name="descricao_en" maxlength="500" class="form-control" rows="5" value="<%=(item ? item.descricao_en : '') %>" ></textarea>
 	</div>
 </div>
 
