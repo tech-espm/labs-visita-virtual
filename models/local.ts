@@ -10,7 +10,9 @@ interface Local {
 	nome_en: string;
 	rgb: string;
 	nome_curto: string;
+	descricao: string;
 	nome_curto_en: string;
+	descricao_en: string;
 	versao: number;
 	criacao: string;
 	exclusao: string | null;
