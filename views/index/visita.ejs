@@ -92,10 +92,25 @@
 			width: 100%;
 			height: 100%;
 		}
+
+		#descricao {
+			position: fixed;
+			top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            z-index: 3;
+            max-width: 80%;
+            text-align: center;
+		}
 	</style>
 </head>
 <body>
 	<div id="canvasZone"><canvas id="renderCanvas"></canvas></div>
+	<div id="descricao"></div>
 	<script type="text/javascript">
 		//<![CDATA[
 		"use strict";
@@ -118,6 +133,7 @@
 		let xrHelper = null;
 		let botoesImagemXR = [];
 		let botaoLocaisXR = null;
+		let botaoDescricaoHTML = null;
 		const rgbPadrao = "#a80532";
 
 		let idioma = "en";
@@ -343,6 +359,19 @@
 			}
 		}
 
+		function mostrarDescricao() {
+			const descricaoDiv = document.getElementById("descricao");
+            const descricao = await obterDescricao(imagemAtual);
+            const descricaoTraduzida = traduzir(descricao);
+
+            descricaoDiv.textContent = descricaoTraduzida;
+            descricaoDiv.style.display = "block";
+		}
+
+		function obterDescricao(indice) {
+			
+        }
+
 		function criarMenuHTML() {
 			const divMenu = document.createElement("div");
 			divMenu.className = "menu";
@@ -389,6 +418,12 @@
 			botaoLocais.style.zIndex = "3";
 			botaoLocais.style.left = "0.5rem";
 			botaoLocais.style.top = "0.5rem";
+
+			const botaoDescricaoHTML = criarBotaoHTML(document.body, traduzir("Descrição"), rgbPadrao, mostrarDescricao);
+			botaoDescricaoHTML.style.position = "fixed"
+			botaoDescricaoHTML.style.zIndex = "3"
+			botaoDescricaoHTML.style.right = "0.5rem"
+			botaoDescricaoHTML.style.top = "0.5rem"
 
 			for (let i = 0; i < imagens.length; i++)
 				criarBotaoImagemHTML(divBotoes, i);
