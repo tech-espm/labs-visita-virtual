@@ -16,8 +16,6 @@ interface Local {
 	versao: number;
 	criacao: string;
 	exclusao: string | null;
-	descricao: string;
-	descricao_en: string;
 }
 
 class Local {
