@@ -84,7 +84,7 @@ class Predio {
 	}
 
 	private static async preencherLocais(sql: app.Sql, predio: Predio): Promise<void> {
-		predio.locais = await sql.query("select l.id, l.nome, l.nome_en, l.rgb, l.versao, l.nome_curto, l.nome_curto_en from predio_local pl inner join local l on l.id = pl.idlocal where pl.idpredio = ? order by pl.ordem asc", [predio.id]);
+		predio.locais = await sql.query("select l.id, l.nome, l.nome_en, l.rgb, l.versao, l.nome_curto, l.nome_curto_en, l.descricao, l.descricao_en from predio_local pl inner join local l on l.id = pl.idlocal where pl.idpredio = ? order by pl.ordem asc", [predio.id]);
 
 		if (predio.locais) {
 			for (let i = predio.locais.length - 1; i >= 0; i--) {
