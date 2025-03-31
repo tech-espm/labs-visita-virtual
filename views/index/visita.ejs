@@ -157,6 +157,15 @@
 			return nome_curto || obj.nome_curto || obj.nome;
 		}
 
+		function obterDescricao(obj) {
+			let descricao = null;
+
+			if (sufixoIdioma)
+				descricao = obj["descricao" + sufixoIdioma]);
+
+			return descricao || obj.descricao || "";
+		}
+
 		function relativeLuminance(rgb) {
 			if ((typeof rgb) === "string")
 				rgb = parseInt(rgb.replace("#", ""), 16);
@@ -361,16 +370,10 @@
 
 		function mostrarDescricao() {
 			const descricaoDiv = document.getElementById("descricao");
-            const descricao = await obterDescricao(imagemAtual);
-            const descricaoTraduzida = traduzir(descricao);
-
-            descricaoDiv.textContent = descricaoTraduzida;
-            descricaoDiv.style.display = "block";
+			const descricao = obterDescricao(imagemAtual);
+			descricaoDiv.textContent = descricao;
+			descricaoDiv.style.display = "block";
 		}
-
-		function obterDescricao(indice) {
-			
-        }
 
 		function criarMenuHTML() {
 			const divMenu = document.createElement("div");
