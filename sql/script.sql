@@ -53,6 +53,8 @@ CREATE TABLE local (
   rgb VARCHAR(10) NOT NULL,
   nome_curto VARCHAR(50) NOT NULL,
   nome_curto_en VARCHAR(50) NOT NULL,
+  descricao TEXT NOT NULL,
+  descricao_en TEXT NOT NULL,
   versao INT NOT NULL,
   criacao datetime NOT NULL,
   exclusao datetime NULL,
