@@ -82,6 +82,22 @@
 			background-color: rgba(0, 0, 0, 0.35);
 		}
 
+		.descricao {
+			position: fixed;
+			z-index: 2;
+			top: 0;
+			right: 0;
+			padding: 10vh 0.5rem 0.5rem;
+			width: 100%;
+			max-width: 400px;
+			text-align: center;
+			user-select: none;
+			background-color: rgba(0, 0, 0, 0.35);
+			color: #fff;
+			font-weight: bold;
+			white-space: pre-wrap;
+		}
+
 		#renderCanvas {
 			width: 100%;
 			height: 100%;
@@ -92,25 +108,10 @@
 			width: 100%;
 			height: 100%;
 		}
-
-		#descricao {
-			position: fixed;
-			top: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            display: none;
-            z-index: 3;
-            max-width: 80%;
-            text-align: center;
-		}
 	</style>
 </head>
 <body>
 	<div id="canvasZone"><canvas id="renderCanvas"></canvas></div>
-	<div id="descricao"></div>
 	<script type="text/javascript">
 		//<![CDATA[
 		"use strict";
@@ -133,13 +134,13 @@
 		let xrHelper = null;
 		let botoesImagemXR = [];
 		let botaoLocaisXR = null;
-		let botaoDescricaoHTML = null;
 		const rgbPadrao = "#a80532";
 
 		let idioma = "en";
 		let sufixoIdioma = "_en";
 		let strings = {
 			"Locais": "Locals",
+			"Descrição": "Description",
 			"Modo WebXR": "WebXR Mode",
 			"Visita Virtual ESPM": "ESPM Virtual Visit",
 		};
@@ -368,17 +369,14 @@
 			}
 		}
 
-		function mostrarDescricao() {
-			const descricaoDiv = document.getElementById("descricao");
-			const descricao = obterDescricao(imagemAtual);
-			descricaoDiv.textContent = descricao;
-			descricaoDiv.style.display = "block";
-		}
-
 		function criarMenuHTML() {
 			const divMenu = document.createElement("div");
 			divMenu.className = "menu";
 			divMenu.style.display = "none";
+
+			const divDescricao = document.createElement("div");
+			divDescricao.className = "descricao";
+			divDescricao.style.display = "none";
 
 			const divBotoes = document.createElement("div");
 			//divBotoes.style.textAlign = "left";
@@ -387,7 +385,12 @@
 			divBotoes.style.flexWrap = "wrap";
 
 			const alternarMenuHTML = function () {
-				divMenu.style.display = ((divMenu.style.display == "none") ? "" : "none");
+				if (divMenu.style.display == "none") {
+					divMenu.style.display = "";
+					divDescricao.style.display = "none";
+				} else {
+					divMenu.style.display = "none";
+				}
 			};
 
 			const criarBotaoHTML = function (pai, texto, rgb, callback) {
@@ -422,12 +425,6 @@
 			botaoLocais.style.left = "0.5rem";
 			botaoLocais.style.top = "0.5rem";
 
-			const botaoDescricaoHTML = criarBotaoHTML(document.body, traduzir("Descrição"), rgbPadrao, mostrarDescricao);
-			botaoDescricaoHTML.style.position = "fixed"
-			botaoDescricaoHTML.style.zIndex = "3"
-			botaoDescricaoHTML.style.right = "0.5rem"
-			botaoDescricaoHTML.style.top = "0.5rem"
-
 			for (let i = 0; i < imagens.length; i++)
 				criarBotaoImagemHTML(divBotoes, i);
 
@@ -438,6 +435,24 @@
 			});
 
 			document.body.appendChild(divMenu);
+
+			const alternarDescricaoHTML = function () {
+				divDescricao.textContent = (obterDescricao(imagens[imagemAtual]) || "[Sem Descrição]");
+				if (divDescricao.style.display == "none") {
+					divDescricao.style.display = "";
+					divMenu.style.display = "none";
+				} else {
+					divDescricao.style.display = "none";
+				}
+			};
+
+			const botaoDescricaoHTML = criarBotaoHTML(document.body, traduzir("Descrição"), rgbPadrao, alternarDescricaoHTML);
+			botaoDescricaoHTML.style.position = "fixed";
+			botaoDescricaoHTML.style.zIndex = "3";
+			botaoDescricaoHTML.style.right = "0.5rem";
+			botaoDescricaoHTML.style.top = "0.5rem";
+
+			document.body.appendChild(divDescricao);
 		}
 
 		async function criarCena() {
