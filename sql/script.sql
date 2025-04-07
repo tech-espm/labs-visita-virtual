@@ -75,3 +75,21 @@ CREATE TABLE predio_local (
   CONSTRAINT predio_local_idpredio_FK FOREIGN KEY (idpredio) REFERENCES predio (id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT predio_local_idlocal_FK FOREIGN KEY (idlocal) REFERENCES local (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE links (
+  id int NOT NULL AUTO_INCREMENT,
+  idusuario int NOT NULL,
+  nome VARCHAR(50) NOT NULL,
+  nome_en VARCHAR(50) NOT NULL,
+  rgb VARCHAR(10) NOT NULL,
+  nome_curto VARCHAR(50) NOT NULL,
+  nome_curto_en VARCHAR(50) NOT NULL,
+  versao INT NOT NULL,
+  criacao datetime NOT NULL,
+  exclusao datetime NULL,
+  url varchar(150) NOT NULL,
+  PRIMARY KEY (id),
+  KEY link_exclusao_IX (exclusao),
+  KEY link_idusuario_exclusao_FK_IX (idusuario, exclusao),
+  CONSTRAINT link_idusuario_FK FOREIGN KEY (idusuario) REFERENCES usuario (id) ON DELETE RESTRICT ON UPDATE RESTRICT
+);
