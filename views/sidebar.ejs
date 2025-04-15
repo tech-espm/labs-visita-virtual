@@ -78,6 +78,26 @@
       </div>
   </li>
 
+  <li class="nav-item">
+    <a
+        class="nav-link collapsed"
+        href="#"
+        data-toggle="collapse"
+        data-target="#collapseLink"
+        aria-expanded="true"
+        aria-controls="collapseLink"
+    >
+        <i class="fas fa-fw fa-map-marker-alt"></i>
+        <span>Links</span>
+    </a>
+    <div id="collapseLink" class="collapse" data-parent="#accordionSidebar">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="<%- root %>/link/criar">Criar</a>
+            <a class="collapse-item" href="<%- root %>/link/listar">Gerenciar</a>
+        </div>
+    </div>
+</li>
+
 <!--
   <hr class="sidebar-divider" />
 
@@ -194,6 +214,16 @@
     <a class="nav-link" href="<%- root %>/exemplo/local">
       <i class="fas fa-fw fa-chart-area"></i>
       <span>Criar Local</span>
+    </a>
+
+  <hr class="sidebar-divider" />
+  
+  <div class="sidebar-heading">Link</div>
+
+  <li class="nav-item">
+    <a class="nav-link" href="<%- root %>/exemplo/link">
+      <i class="fas fa-fw fa-chart-area"></i>
+      <span>Criar Link</span>
     </a>
   </li>
 

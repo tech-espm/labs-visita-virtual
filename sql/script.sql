@@ -76,7 +76,7 @@ CREATE TABLE predio_local (
   CONSTRAINT predio_local_idlocal_FK FOREIGN KEY (idlocal) REFERENCES local (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE links (
+CREATE TABLE link (
   id int NOT NULL AUTO_INCREMENT,
   idusuario int NOT NULL,
   nome VARCHAR(50) NOT NULL,

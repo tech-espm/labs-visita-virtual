@@ -1,0 +1,69 @@
+﻿<table class="table table-flush table-striped table-hover" id="tabela"></table>
+
+<%- contentFor("scripts") %>
+<script type="text/javascript">
+	//<![CDATA[
+	"use strict";
+
+	const idusuario = parseInt("<%- usuario.id %>");
+	const admin = !!parseInt("<%- (usuario.admin ? 1 : 0) %>");
+
+	var tabela = prepareDataTable("tabela", {
+		order: [[1, "asc"]],
+		deferRender: true,
+		columns: [
+			{ title: "", "class": "col-min", searchable: false, orderable: false, data: "id", render: function (v, type, row) { return ((admin || row.idusuario === idusuario) ? ('<a target="_blank" title="Editar" href="<%- root %>/link/editar?id=' + row.id + '" class="btn btn-sm btn-outline-primary"><i class="fa fa-fw fa-edit"></i></a> ') : '') + '<a target="_blank" title="Baixar Imagem" href="<%- root %>/app/tour/imagem/' + row.id + '" class="btn btn-sm btn-outline-success"><i class="fa fa-fw fa-external-link-alt"></i></a>' + ((admin || row.idusuario === idusuario) ? ' <button title="Excluir" type="button" data-excluir="1" class="btn btn-sm btn-outline-danger"><i class="fa fa-fw fa-times"></i></button>' : ''); } },
+			{ title: "Nome", render: encode, data: "nome" },
+			{ title: "Nome em Inglês", render: encode, data: "nome_en" },
+			{ title: "Url", render: encode, data: "url" },
+			{ title: "Usuário", render: encode, data: "usuario" },
+			{ title: "Criação", "class": "col-min text-right", "type": "customdateint", data: "criacao" }
+		],
+		data: <%- JSON.stringify(lista) %>,
+		export: { xlsx: true, title: "Links" }
+	});
+
+	$("#tabela").on("click", "tbody button", function () {
+		if (JsonWebApi.active)
+			return;
+
+		var trClicada = this.parentNode.parentNode,
+			nome = null,
+			link = tabela.row(trClicada).data();
+
+		if (this.getAttribute("data-excluir")) {
+			Swal.okcancel({
+				html: 'Tem certeza que deseja excluir o link "' + link.nome + '"? Esta operação NÃO pode ser desfeita!<br/><br/>Para confirmar a exclusão, por favor, digite abaixo o nome do link conforme exibido acima.<br/><br/><label for="txtExcluirNome">Nome do link</label><input type="text" class="form-control" spellcheck="false" autocomplete="off" id="txtExcluirNome" />',
+				confirmButtonText: "Excluir",
+				preConfirm: function () {
+					nome = $("#txtExcluirNome").val().toLowerCase();
+					return true;
+				}
+			}, null, true).then(function (result) {
+				if (JsonWebApi.active || !trClicada)
+					return;
+
+				if (result.value) {
+					if (nome !== link.nome.toLowerCase()) {
+						Swal.error("O nome do link não confere! " + emoji.sad);
+						return;
+					}
+
+					Swal.wait();
+
+					JsonWebApi.delete("<%- root %>/api/link/excluir", function (response) {
+						if (response.success) {
+							Swal.success("Link excluído com sucesso! " + emoji.happy);
+							tabela.row(trClicada).remove().draw();
+						} else {
+							Swal.error(response.value + " " + emoji.sad);
+						}
+						trClicada = null;
+					}, "id", link.id);
+				}
+			});
+		}
+	});
+
+	//]]>
+</script>
