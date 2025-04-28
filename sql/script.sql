@@ -82,8 +82,6 @@ CREATE TABLE link (
   nome VARCHAR(50) NOT NULL,
   nome_en VARCHAR(50) NOT NULL,
   rgb VARCHAR(10) NOT NULL,
-  nome_curto VARCHAR(50) NOT NULL,
-  nome_curto_en VARCHAR(50) NOT NULL,
   versao INT NOT NULL,
   criacao datetime NOT NULL,
   exclusao datetime NULL,

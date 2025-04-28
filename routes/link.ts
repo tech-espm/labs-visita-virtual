@@ -41,7 +41,6 @@ class LinkRoute {
     }
   }
 
-  // Renderiza a lista de locais
   public static async listar(req: app.Request, res: app.Response) {
     let u = await Usuario.cookie(req);
     if (!u)
