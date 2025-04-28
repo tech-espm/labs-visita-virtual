@@ -117,7 +117,7 @@ class Link {
 					dadosAntigos[0].url !== link.url
 				);
 
-				await sql.query(`update url set nome = ?, nome_en = ?, rgb = ?, url = ? ${(alterarVersao ? ", versao = versao + 1" : "")} where id = ? and exclusao is null`, [link.nome, link.nome_en, link.rgb, link.url, link.id]);
+				await sql.query(`update link set nome = ?, nome_en = ?, rgb = ?, url = ? ${(alterarVersao ? ", versao = versao + 1" : "")} where id = ? and exclusao is null`, [link.nome, link.nome_en, link.rgb, link.url, link.id]);
 
 				if (!sql.affectedRows)
 					return "Link não encontrado";

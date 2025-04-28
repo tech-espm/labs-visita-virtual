@@ -2,6 +2,7 @@ import app = require("teem");
 import Local = require("../models/local");
 import Predio = require("../models/predio");
 import Usuario = require("../models/usuario");
+import Link = require("../models/link");
 
 class PredioRoute {
   // Renderiza a página de criação
@@ -17,6 +18,7 @@ class PredioRoute {
         item: null,
         usuarios: (u.admin ? await Usuario.listarCombo() : null),
         locais: await Local.listarCombo(),
+        links: await Link.listarCombo(),
       });
   }
 
@@ -40,6 +42,7 @@ class PredioRoute {
           item: item,
           usuarios: (u.admin ? await Usuario.listarCombo() : null),
           locais: await Local.listarCombo(),
+          links: await Link.listarCombo(),
         });
     }
   }
