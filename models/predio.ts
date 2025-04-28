@@ -14,12 +14,20 @@ interface Predio {
 
 	// Utilizado apenas para a visita
 	locais?: any[] | null;
+	links?: any[] | null;
 }
 
 interface PredioLocal {
 	id: number;
 	idpredio: number;
 	idlocal: number;
+	ordem: number;
+}
+
+interface PredioLink {
+	id: number;
+	idpredio: number;
+	idlink: number;
 	ordem: number;
 }
 
@@ -68,6 +76,27 @@ class Predio {
 			predio.locais = [];
 		}
 
+		if (predio.links) {
+			if (!Array.isArray(predio.links))
+				predio.links = [predio.links];
+
+			for (let i = predio.links.length - 1; i >= 0; i--) {
+				if (!(predio.links[i] = parseInt(predio.links[i])))
+					return "Link inválido";
+			}
+
+			for (let i = predio.links.length - 1; i >= 0; i--) {
+				const idlink = predio.links[i];
+
+				for (let j = i - 1; j >= 0; j--) {
+					if (predio.links[j] === idlink)
+						return "Existem links repetidos";
+				}
+			}
+		} else {
+			predio.links = [];
+		}
+
 		return null;
 	}
 
@@ -93,6 +122,16 @@ class Predio {
 		}
 	}
 
+	private static async preencherLinks(sql: app.Sql, predio: Predio): Promise<void> {
+		predio.links = await sql.query("select l.id, l.nome, l.nome_en, l.rgb, l.versao, l.url from predio_link pl inner join link l on l.id = pl.idlink where pl.idpredio = ? order by pl.ordem asc", [predio.id]);
+
+		if (predio.links) {
+			for (let i = predio.links.length - 1; i >= 0; i--) {
+				predio.links[i].url = `${app.root}/app/${predio.url}/imagem/${predio.links[i].id}`;
+			}
+		}
+	}
+
 	public static obter(id: number, idusuario: number, idperfil: Perfil): Promise<Predio | null> {
 		return app.sql.connect(async (sql) => {
 			const lista: Predio[] = await sql.query(
@@ -106,6 +145,8 @@ class Predio {
 			const predio = lista[0];
 
 			await Predio.preencherLocais(sql, predio);
+
+			await Predio.preencherLinks(sql, predio);
 
 			return predio;
 		});
@@ -121,6 +162,8 @@ class Predio {
 			const predio = lista[0];
 
 			await Predio.preencherLocais(sql, predio);
+
+			await Predio.preencherLinks(sql, predio);
 
 			return predio;
 		});
@@ -144,6 +187,11 @@ class Predio {
 						await sql.query("insert into predio_local (idpredio, idlocal, ordem) values (?, ?, ?)", [predio.id, predio.locais[i], i]);
 				}
 
+				if (predio.links) {
+					for (let i = 0; i < predio.links.length; i++)
+						await sql.query("insert into predio_link (idpredio, idlink, ordem) values (?, ?, ?)", [predio.id, predio.links[i], i]);
+				}
+
 				await sql.commit();
 
 				return null;
@@ -154,6 +202,8 @@ class Predio {
 					case "ER_NO_REFERENCED_ROW":
 					case "ER_NO_REFERENCED_ROW_2":
 						return "Usuário ou local não encontrado";
+					case "ER_NO_REFERENCED_ROW_3":
+						return "Usuário ou link não encontrado";
 				}
 
 				throw ex;
@@ -185,12 +235,26 @@ class Predio {
 				const atualizar: PredioLocal[] = [];
 				const novos: PredioLocal[] = [];
 
+				const antigos_link: PredioLink[] = (await sql.query("select id, idpredio, idlink, ordem from predio_link where idpredio = ?", [predio.id])) || [];
+				const atualizar_link: PredioLink[] = [];
+				const novos_link: PredioLink[] = [];
+
 				if (predio.locais) {
 					for (let i = predio.locais.length - 1; i >= 0; i--)
 						novos.push({
 							id: 0,
 							idpredio: predio.id,
 							idlocal: predio.locais[i],
+							ordem: i,
+						});
+				}
+
+				if (predio.links) {
+					for (let i = predio.links.length - 1; i >= 0; i--)
+						novos_link.push({
+							id: 0,
+							idpredio: predio.id,
+							idlink: predio.links[i],
 							ordem: i,
 						});
 				}
@@ -212,6 +276,23 @@ class Predio {
 					}
 				}
 
+				for (let i = antigos_link.length - 1; i >= 0; i--) {
+					const antigo = antigos_link[i];
+
+					for (let j = novos_link.length - 1; j >= 0; j--) {
+						const novo_link = novos_link[j];
+						if (antigo.idlink === novo_link.idlink) {
+							antigos.splice(i, 1);
+							novos.splice(j, 1);
+							if (antigo.ordem !== novo_link.ordem) {
+								antigo.ordem = novo_link.ordem;
+								atualizar_link.push(antigo);
+							}
+							break;
+						}
+					}
+				}
+
 				// Tenta reaproveitar os id's antigos se precisar adicionar algo novo
 				for (let i = novos.length - 1; i >= 0; i--) {
 					if (!antigos.length)
@@ -226,6 +307,19 @@ class Predio {
 					novos.splice(i, 1);
 				}
 
+				for (let i = novos_link.length - 1; i >= 0; i--) {
+					if (!antigos_link.length)
+						break;
+
+					const antigo_link = antigos_link.pop();
+					antigo_link.idlink = novos_link[i].idlink;
+					antigo_link.ordem = novos_link[i].ordem;
+
+					atualizar_link.push(antigo_link);
+
+					novos_link.splice(i, 1);
+				}
+
 				for (let i = antigos.length - 1; i >= 0; i--)
 					await sql.query("delete from predio_local where id = ?", [antigos[i].id]);
 
@@ -234,6 +328,17 @@ class Predio {
 
 				for (let i = novos.length - 1; i >= 0; i--)
 					await sql.query("insert into predio_local (idpredio, idlocal, ordem) values (?, ?, ?)", [novos[i].idpredio, novos[i].idlocal, novos[i].ordem]);
+
+				await sql.commit();
+
+				for (let i = antigos_link.length - 1; i >= 0; i--)
+					await sql.query("delete from predio_link where id = ?", [antigos_link[i].id]);
+
+				for (let i = atualizar_link.length - 1; i >= 0; i--)
+					await sql.query("update predio_link set idlink = ?, ordem = ? where id = ?", [atualizar_link[i].idlink, atualizar_link[i].ordem, atualizar_link[i].id]);
+
+				for (let i = novos_link.length - 1; i >= 0; i--)
+					await sql.query("insert into predio_link (idpredio, idlink, ordem) values (?, ?, ?)", [novos_link[i].idpredio, novos_link[i].idlink, novos_link[i].ordem]);
 
 				await sql.commit();
 
@@ -264,6 +369,7 @@ class Predio {
 				return "Tour não encontrado";
 
 			await sql.query("delete from predio_local where idpredio = ?", [id]);
+			await sql.query("delete from predio_link where idpredio = ?", [id]);
 
 			await sql.commit();
 

@@ -91,3 +91,15 @@ CREATE TABLE link (
   KEY link_idusuario_exclusao_FK_IX (idusuario, exclusao),
   CONSTRAINT link_idusuario_FK FOREIGN KEY (idusuario) REFERENCES usuario (id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
+
+CREATE TABLE predio_link (
+  id int NOT NULL AUTO_INCREMENT,
+  idpredio int NOT NULL,
+  idlink int NOT NULL,
+  ordem int NOT NULL,
+  PRIMARY KEY (id),
+  KEY predio_link_idpredio_ordem_FK_IX (idpredio, ordem),
+  KEY predio_link_idlink_FK_IX (idlink),
+  CONSTRAINT predio_link_idpredio_FK FOREIGN KEY (idpredio) REFERENCES predio (id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT predio_link_idlink_FK FOREIGN KEY (idlink) REFERENCES link (id) ON DELETE CASCADE ON UPDATE CASCADE
+);

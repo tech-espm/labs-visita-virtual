@@ -12,7 +12,7 @@
 		order: [[1, "asc"]],
 		deferRender: true,
 		columns: [
-			{ title: "", "class": "col-min", searchable: false, orderable: false, data: "id", render: function (v, type, row) { return ((admin || row.idusuario === idusuario) ? ('<a target="_blank" title="Editar" href="<%- root %>/link/editar?id=' + row.id + '" class="btn btn-sm btn-outline-primary"><i class="fa fa-fw fa-edit"></i></a> ') : '') + '<a target="_blank" title="Baixar Imagem" href="<%- root %>/app/tour/imagem/' + row.id + '" class="btn btn-sm btn-outline-success"><i class="fa fa-fw fa-external-link-alt"></i></a>' + ((admin || row.idusuario === idusuario) ? ' <button title="Excluir" type="button" data-excluir="1" class="btn btn-sm btn-outline-danger"><i class="fa fa-fw fa-times"></i></button>' : ''); } },
+			{ title: "", "class": "col-min", searchable: false, orderable: false, data: "id", render: function (v, type, row) { return ((admin || row.idusuario === idusuario) ? ('<a target="_blank" title="Editar" href="<%- root %>/link/editar?id=' + row.id + '" class="btn btn-sm btn-outline-primary"><i class="fa fa-fw fa-edit"></i></a> ') : '') + '<a target="_blank" title="Acessar URL" href="' + row.url + '" class="btn btn-sm btn-outline-success"><i class="fa fa-fw fa-external-link-alt"></i></a>' + ((admin || row.idusuario === idusuario) ? ' <button title="Excluir" type="button" data-excluir="1" class="btn btn-sm btn-outline-danger"><i class="fa fa-fw fa-times"></i></button>' : ''); } },
 			{ title: "Nome", render: encode, data: "nome" },
 			{ title: "Nome em Inglês", render: encode, data: "nome_en" },
 			{ title: "URL", render: encode, data: "url" },

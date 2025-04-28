@@ -87,6 +87,57 @@
 	</table>
 </div>
 
+<hr class="my-5" />
+
+<h2 class="my-4">Links</h2>
+
+<div class="row">
+	<div class="col-sm-8 mb-3">
+		<div class="cb-search">
+			<select id="idlink" name="idlink" class="form-control" size="1">
+				<option value="">Selecione...</option>
+				<% for (let i = 0; i < links.length; i++) { %>
+				<option data-rgb="<%= links[i].rgb %>" value="<%= links[i].id %>"><%= links[i].nome %></option>
+				<% } %>
+			</select>
+		</div>
+	</div>
+
+	<div class="col-sm-4 mb-3">
+		<button type="button" onclick="adicionarLink()" class="btn btn-primary btn-block"><i class="fa fa-plus"></i> Adicionar</button>
+	</div>
+</div>
+
+<div class="table-responsive">
+	<table class="table table-striped table-hover ui-sortable mt-3 mb-0">
+		<thead>
+			<tr>
+				<th class="col-min"></th>
+				<th class="col-min">Ordem</th>
+				<th class="col-min">Cor</th>
+				<th>Link</th>
+			</tr>
+		</thead>
+		<tbody id="tbodyLinks" class="secao-links">
+			<% if (item && item.links) { for (let i = 0; i < item.links.length; i++) { %>
+			<tr class="ui-sortable-handle">
+				<td class="col-min">
+					<button title="Excluir" type="button" onclick="removerLink(this)" class="btn btn-sm btn-outline-danger"><i class="fa fa-fw fa-times"></i></button>
+				</td>
+				<td class="col-min text-center link-enum"></td>
+				<td class="col-min text-center">
+					<span style="background-color: <%- item.links[i].rgb %>; display: inline-block; width: 1rem; height: 1rem; border-radius: 1rem; vertical-align: middle;"></span>
+				</td>
+				<td>
+					<input type="hidden" name="links" value="<%- item.links[i].id %>" />
+					<%= item.links[i].nome %>
+				</td>
+			</tr>
+			<% } } %>
+		</tbody>
+	</table>
+</div>
+
 <%- contentFor("styles") %>
 <link rel="stylesheet" type="text/css" href="<%- staticRoot %>/lib/jquery-ui-1.13.2/jquery-ui.min.css" />
 
@@ -98,6 +149,15 @@
 	.local-enum::before {
 		counter-increment: secao-locais;
 		content: counter(secao-locais);
+	}
+
+	.secao-links {
+		counter-reset: secao-links;
+	}
+
+	.link-enum::before {
+		counter-increment: secao-links;
+		content: counter(secao-links);
 	}
 
 	.ui-sortable-handle {
@@ -117,6 +177,8 @@
 	//<% } %>
 
 	prepareCbSearch(document.getElementById("idlocal"));
+
+	prepareCbSearch(document.getElementById("idlink"));
 
 	function adicionarLocal() {
 		if (JsonWebApi.active)
@@ -142,6 +204,30 @@
 		</tr>`);
 	}
 
+	function adicionarLink() {
+		if (JsonWebApi.active)
+			return;
+
+		const id = parseInt($("#idlink").val());
+
+		if (!id)
+			return;
+
+		$("#tbodyLinks").append(`<tr class="ui-sortable-handle">
+			<td class="col-min">
+				<button title="Excluir" type="button" onclick="removerLink(this)" class="btn btn-sm btn-outline-danger"><i class="fa fa-fw fa-times"></i></button>
+			</td>
+			<td class="col-min text-center link-enum"></td>
+			<td class="col-min text-center">
+				<span style="background-color: ${$("#idlink option:selected").attr("data-rgb")}; display: inline-block; width: 1rem; height: 1rem; border-radius: 1rem; vertical-align: middle;"></span>
+			</td>
+			<td>
+				<input type="hidden" name="links" value="${id}" />
+				${$("#idlink option:selected").html()}
+			</td>
+		</tr>`);
+	}
+
 	function removerLocal(btn) {
 		if (JsonWebApi.active)
 			return;
@@ -149,7 +235,16 @@
 		$(btn.parentNode.parentNode).remove();
 	}
 
+	function removerLink(btn) {
+		if (JsonWebApi.active)
+			return;
+
+		$(btn.parentNode.parentNode).remove();
+	}
+
 	$("#tbodyLocais").sortable().disableSelection();
+
+	$("#tbodyLinks").sortable().disableSelection();
 
 	$("#url").mask("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ", { translation: {
 			"Z": {
@@ -192,6 +287,7 @@
 				if (response.success) {
 					resetForm("#form");
 					$("#tbodyLocais").empty();
+					$("#tbodyLinks").empty();
 					//<% if (usuario.admin) { %>
 					setCbSearch(document.getElementById("idusuario"), "<%- usuario.id %>");
 					//<% } %>
