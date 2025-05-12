@@ -124,12 +124,6 @@ class Predio {
 
 	private static async preencherLinks(sql: app.Sql, predio: Predio): Promise<void> {
 		predio.links = await sql.query("select l.id, l.nome, l.nome_en, l.rgb, l.versao, l.url from predio_link pl inner join link l on l.id = pl.idlink where pl.idpredio = ? order by pl.ordem asc", [predio.id]);
-
-		if (predio.links) {
-			for (let i = predio.links.length - 1; i >= 0; i--) {
-				predio.links[i].url = `${app.root}/app/${predio.url}/imagem/${predio.links[i].id}`;
-			}
-		}
 	}
 
 	public static obter(id: number, idusuario: number, idperfil: Perfil): Promise<Predio | null> {

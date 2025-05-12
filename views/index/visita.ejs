@@ -6,6 +6,8 @@
 
 	<title><%= predio.nome %> - Visita Virtual ESPM</title>
 
+	<link rel="stylesheet" type="text/css" href="<%- staticRoot %>/lib/fontawesome-free/css/all.min.css" />
+
 	<!--
 		Babylon.js 6.22.1
 		https://github.com/BabylonJS/Babylon.js/releases/download/6.22.1/cdnSnapshot.zip
@@ -45,7 +47,7 @@
 			font-family: "Segoe UI", sans-serif;
 		}
 
-		button {
+		button, a.botao {
 			font-size: inherit;
 			font-family: inherit;
 			font-weight: bold;
@@ -57,16 +59,19 @@
 			border: 1px solid white;
 			outline: none;
 			margin: 0.5rem;
+			text-decoration: none;
 		}
 
-		button:hover, button:focus {
+		button:hover, button:focus, a.botao:hover, a.botao:focus {
 			opacity: 0.8;
 			outline: none;
+			text-decoration: none;
 		}
 
-		button:active {
+		button:active, a.botao:active {
 			opacity: 0.6;
 			outline: none;
+			text-decoration: none;
 		}
 
 		.menu {
@@ -122,6 +127,7 @@
 		const modoDebug = (window.location.href.indexOf("debug") >= 0);
 
 		const imagens = predio.locais;
+		const links = predio.links;
 
 		let canvas = document.getElementById("renderCanvas");
 		let engine = null;
@@ -384,6 +390,12 @@
 			divBotoes.style.flexDirection = "row";
 			divBotoes.style.flexWrap = "wrap";
 
+			const divLinks = document.createElement("div");
+			//divLinks.style.textAlign = "left";
+			divLinks.style.display = "flex";
+			divLinks.style.flexDirection = "row";
+			divLinks.style.flexWrap = "wrap";
+
 			const alternarMenuHTML = function () {
 				if (divMenu.style.display == "none") {
 					divMenu.style.display = "";
@@ -419,6 +431,30 @@
 				});
 			};
 
+			const criarLinkHTML = function (pai, indice) {
+				let rgb = links[indice].rgb;
+				if (!rgb || rgb.length !== 7)
+					rgb = rgbPadrao;
+			
+				const link = document.createElement("a");
+				link.className = "botao";
+				link.setAttribute("target", "_blank");
+				link.setAttribute("href", links[indice].url);
+				link.textContent = obterNomeCurto(links[indice]);
+				link.style.backgroundColor = rgb;
+				link.style.color = textColorForBackground(rgb);
+				link.style.borderColor = link.style.color;
+				link.style.flex = "1 1 0";
+
+				const i = document.createElement("i");
+				i.className = "fa fa-fw fa-external-link-alt";
+				link.insertBefore(i, link.firstChild);
+
+				pai.appendChild(link);
+
+				return link;
+			};
+
 			const botaoLocais = criarBotaoHTML(document.body, traduzir("Locais"), rgbPadrao, alternarMenuHTML);
 			botaoLocais.style.position = "fixed";
 			botaoLocais.style.zIndex = "3";
@@ -429,6 +465,18 @@
 				criarBotaoImagemHTML(divBotoes, i);
 
 			divMenu.appendChild(divBotoes);
+
+			if (links && links.length) {
+				let hr = document.createElement("hr");
+				hr.style.borderColor = "#ffffff";
+				hr.style.borderStyle = "solid";
+				divMenu.appendChild(hr);
+
+				for (let i = 0; i < links.length; i++)
+					criarLinkHTML(divLinks, i);
+
+				divMenu.appendChild(divLinks);
+			}
 
 			const botaoXR = criarBotaoHTML(divMenu, traduzir("Modo WebXR"), null, function () {
 				window.location.href += "?webxr";
