@@ -140,6 +140,7 @@
 		let xrHelper = null;
 		let botoesImagemXR = [];
 		let botaoLocaisXR = null;
+		let botaoLinksXR = null;
 		const rgbPadrao = "#a80532";
 
 		let idioma = "en";
@@ -259,6 +260,17 @@
 					alternarMenu();
 				criarDomo(true);
 			});
+		}
+
+		function criarBotaoLinks(indice) {
+			return criarBotao(
+				"botaoLink" + indice,
+				obterNomeCurto(links[indice]),
+				links[indice].rgb,
+				function () {
+					window.open(links[indice].url, "_blank");
+				}
+			);
 		}
 
 		function criarBotoesMenuXR(visibilidadeBotoesImagem) {
