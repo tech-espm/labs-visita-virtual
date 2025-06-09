@@ -262,13 +262,10 @@
 			});
 		}
 
-		function criarBotaoLinks(indice) {
-			return criarBotao(
-				"botaoLink" + indice,
-				obterNomeCurto(links[indice]),
-				links[indice].rgb,
+		function criarBotaoLink(indice) {
+			return criarBotao("botaoLink" + indice, "🔗 " + obterNomeCurto(links[indice]), links[indice].rgb,
 				function () {
-					window.open(links[indice].url, "_blank");
+					window.open(links[indice].url);
 				}
 			);
 		}
@@ -310,6 +307,11 @@
 			botaoLocaisXR = criarBotao("locais", traduzir("Locais"), null, alternarMenu);
 			for (let i = 0; i < imagens.length; i++) {
 				const botao = criarBotaoImagem(i);
+				botao.isVisible = visibilidadeBotoesImagem;
+				botoesImagemXR.push(botao);
+			}
+			for (let i = 0; i < links.length; i++) {
+				const botao = criarBotaoLink(i);
 				botao.isVisible = visibilidadeBotoesImagem;
 				botoesImagemXR.push(botao);
 			}
